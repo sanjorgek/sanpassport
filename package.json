@@ -1,0 +1,32 @@
+{
+  "name": "sanpassport",
+  "version": "1.0.0",
+  "description": "Passport adapter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanjorgek/sanpassport"
+  },
+  "keywords": [
+    "passport",
+    "node",
+    "local",
+    "login",
+    "auth"
+  ],
+  "author": "sanjorgek",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/sanjorgek/sanpassport/issues"
+  },
+  "homepage": "https://github.com/sanjorgek/sanpassport#readme",
+  "dependencies": {
+    "debug": "^2.2.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "zxcvbn": "^4.3.0"
+  }
+}
