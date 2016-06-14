@@ -5,7 +5,7 @@ var passport = require('passport')
 
 const MIN_PASSWORD_SCORE = 2;
 
-module.exports = function (userModel) {
+module.exports = function (userModel, urlRedirect) {
   passport.serializeUser(function(user, done) {
     done(null, user.id);
   });
@@ -67,7 +67,7 @@ module.exports = function (userModel) {
       }
       req.logIn(user, function(err) {
         if (err) { return next(err); }
-        return res.redirect('/');
+        return res.redirect(urlRedirect || '/');
       });
     })(req, res, next);
   };

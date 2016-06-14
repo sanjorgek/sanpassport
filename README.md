@@ -31,7 +31,15 @@ var userModel = mongoose.model('User', userSchema);
 
 ## Use
 ~~~js
-var sanpassport = require('sanpassport')(userModel);
+var urlRedirect = "/adm";
+var sanpassport = require('sanpassport')(userModel, urlRedirect);
+~~~
+Then you can use, example with express.js:
+~~~js
+app.use(passport.initialize());
+app.use(passport.session());
+//...
+app.post("/login", sanpassport.login);
 ~~~
 
 
