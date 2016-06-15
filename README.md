@@ -40,6 +40,22 @@ app.use(passport.initialize());
 app.use(passport.session());
 //...
 app.post("/login", sanpassport.login);
+app.post("/secure/route", sanpassport.ensureAuthenticated, function(req, res){
+  //...
+});
+app.get("/adm/route", sanpassport.ensureAdmin, function(req, res){
+  //...
+});
+app.post("/signin", function(req, res){
+  var jsonBody = req.body;
+  sanpassport.createUser(jsonBody, function(err, user){
+    if(err || !user){
+      res.send(404);
+    }else{
+      res.send(200);
+    }
+  });
+});
 ~~~
 
 
