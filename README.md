@@ -9,10 +9,9 @@ First
 ~~~bash
 $ npm install sanpassport 
 ~~~
-Then you need a valid user model/schema with constructor, findById, comparePassword and findOne functions. For example:
+Then you need a valid user model/schema with constructor, findById and findOne functions, also every object need comparePassword and save. One example with mongoose:
 ~~~js
 var mongoose = require('mongoose');
-//...
 var Schema = mongoose.Schema;
 var userSchema = new Schema({
   username: { type: String, required: true, unique: true },
@@ -26,13 +25,14 @@ var userSchema = new Schema({
 userSchema.methods.comparePassword = function(candidatePassword, cb) {
   //do things
 };
-var userModel = mongoose.model('User', userSchema);
+var UserModel = mongoose.model('User', userSchema);
 ~~~
 
 ## Use
 ~~~js
-var urlRedirect = "/adm";
-var sanpassport = require('sanpassport')(userModel, urlRedirect);
+var passport = require("passport");
+//...
+var sanpassport = require('sanpassport')(passport, UserModel);
 ~~~
 Then you can use, example with express.js:
 ~~~js
