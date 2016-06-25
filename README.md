@@ -36,8 +36,8 @@ var sanpassport = require('sanpassport')(passport, UserModel);
 ~~~
 Then you can use, example with express.js:
 ~~~js
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(sanpassport.initialize());
+app.use(sanpassport.session());
 //...
 app.post("/login", sanpassport.login);
 app.post("/secure/route", sanpassport.ensureAuthenticated, function(req, res){

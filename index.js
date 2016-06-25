@@ -92,6 +92,10 @@ module.exports = function (passport, userModel, redirectCB) {
 
     createUser : createUser,
     
-    login: login
+    login: login,
+    
+    initialize: passport.initialize,
+    
+    session: passport.session
   };
 }
