@@ -31,8 +31,11 @@ var UserModel = mongoose.model('User', userSchema);
 ## Use
 ~~~js
 var passport = require("passport");
-//...
-var sanpassport = require('sanpassport')(passport, UserModel);
+//optional
+var redirectCb = function(req, res){
+  //...
+};
+var sanpassport = require('sanpassport')(passport, UserModel, redirectCb);
 ~~~
 Then you can use, example with express.js:
 ~~~js
