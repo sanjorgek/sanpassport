@@ -48,14 +48,16 @@ module.exports = function (passport, userModel, redirectCB) {
 
   function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) { return next(); }
-    res.send(403);
+    res.status(403);
+    next(403);
   };
 
   function ensureAdmin(req, res, next) {
-    if(req.user && req.user.admin === true)
-        next();
-    else
-        res.send(405);
+    if(req.user && req.user.admin === true) next();
+    else{
+        res.status(405);
+        next(405);
+    }
   };
 
   function createUser(userJson, done) {
@@ -75,7 +77,8 @@ module.exports = function (passport, userModel, redirectCB) {
       if (err) { return next(err) }
       if (!user) {
         req.session.messages =  [info.message];
-        return res.send(401)
+        res.status(401);
+        next(401);
       }
       req.logIn(user, function(err) {
         if (err) { return next(err); }
