@@ -61,8 +61,7 @@ module.exports = function (passport, userModel, redirectCB) {
   function createUser(userJson, done) {
     var result = zxcvbn(userJson.password);
     if (result.score < MIN_PASSWORD_SCORE) return done(new Error("Password is too simple"));
-    var user = new userModel(userJson);
-    user.save(function(err) {
+    userModel.create(userJson, function(err, user) {
         if(err) {
             done(err);
         } else {

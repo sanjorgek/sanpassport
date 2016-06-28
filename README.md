@@ -9,7 +9,7 @@ First
 ~~~bash
 $ npm install sanpassport 
 ~~~
-Then you need a valid user model/schema with constructor, findById and findOne functions, also every object need comparePassword and save. One example with mongoose:
+Then you need a valid user model/schema with constructor, findById and findOne functions, also every object need comparePassword and create. One example with mongoose:
 ~~~js
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
