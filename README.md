@@ -35,9 +35,13 @@ var passport = require("passport");
 var redirectCb = function(req, res){
   //...
 };
-var sanpassport = require('sanpassport')(passport, UserModel, redirectCb);
+//optional
+var strategyFun = function(username, password, done){
+  //...
+};
+var sanpassport = require('sanpassport')(passport, UserModel, redirectCb, strategyFun);
 ~~~
-Then you can use, example with express.js:
+Then you can use, example with [express.js](http://expressjs.com/):
 ~~~js
 app.use(sanpassport.initialize());
 app.use(sanpassport.session());

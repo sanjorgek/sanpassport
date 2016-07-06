@@ -1,13 +1,41 @@
-var LocalStrategy = require('passport-local').Strategy
+var passport = require('passport')
+  , LocalStrategy = require('passport-local').Strategy
   , debug = require('debug')('sanpassport')
   , zxcvbn = require("zxcvbn");
 
 const MIN_PASSWORD_SCORE = 2;
 
-module.exports = function (passport, userModel, redirectCB) {
-  if(typeof redirectCB != 'function'){
+module.exports = function (userModel, redirectCB, strategyFunc) {
+  if(!redirectCB || (typeof redirectCB != 'function')){
     redirectCB = function (req, res) {
       res.redirect("/");
+    }
+  }
+  
+  if(!strategyFunc || (typeof strategyFunc != 'function')){
+    strategyFunc = function(username, password, done) {
+      userModel.findOne({ username: username }, function(err, user) {
+        if (err) {
+          debug(err);
+          return done(err);
+        }
+        if (!user) {
+          debug("not user");
+          return done(null, false, { message: 'Unknown user ' + username });
+        }
+        user.comparePassword(password, function(err, isMatch) {
+          if (err){
+            debug(err);
+            return done(err);
+          }
+          if(isMatch) {
+            return done(null, user);
+          } else {
+            debug("don't match");
+            return done(null, false, { message: 'Invalid password' });
+          }
+        });
+      });
     }
   }
   
@@ -21,30 +49,7 @@ module.exports = function (passport, userModel, redirectCB) {
     });
   });
 
-  passport.use(new LocalStrategy(function(username, password, done) {
-    userModel.findOne({ username: username }, function(err, user) {
-      if (err) {
-        debug(err);
-        return done(err);
-      }
-      if (!user) {
-        debug("not user");
-        return done(null, false, { message: 'Unknown user ' + username });
-      }
-      user.comparePassword(password, function(err, isMatch) {
-        if (err){
-          debug(err);
-          return done(err);
-        }
-        if(isMatch) {
-          return done(null, user);
-        } else {
-          debug("don't match");
-          return done(null, false, { message: 'Invalid password' });
-        }
-      });
-    });
-  }));
+  passport.use(new LocalStrategy(strategyFunc));
 
   function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) { return next(); }
