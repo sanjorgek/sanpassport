@@ -1,11 +1,10 @@
-var passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
+var LocalStrategy = require('passport-local').Strategy
   , debug = require('debug')('sanpassport')
   , zxcvbn = require("zxcvbn");
 
 const MIN_PASSWORD_SCORE = 2;
 
-module.exports = function (userModel, redirectCB, strategyFunc) {
+module.exports = function (passport, userModel, redirectCB, strategyFunc) {
   if(!redirectCB || (typeof redirectCB != 'function')){
     redirectCB = function (req, res) {
       res.redirect("/");
