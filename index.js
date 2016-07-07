@@ -1,11 +1,10 @@
-var passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
+var LocalStrategy = require('passport-local').Strategy
   , debug = require('debug')('sanpassport')
   , zxcvbn = require("zxcvbn");
 
 const MIN_PASSWORD_SCORE = 2;
 
-module.exports = function (userModel, redirectCB, strategyFunc) {
+module.exports = function (passport, userModel, redirectCB, strategyFunc) {
   if(!redirectCB || (typeof redirectCB != 'function')){
     redirectCB = function (req, res) {
       res.redirect("/");
@@ -20,7 +19,6 @@ module.exports = function (userModel, redirectCB, strategyFunc) {
           return done(err);
         }
         if (!user) {
-          debug("not user");
           return done(null, false, { message: 'Unknown user ' + username });
         }
         user.comparePassword(password, function(err, isMatch) {
@@ -40,7 +38,7 @@ module.exports = function (userModel, redirectCB, strategyFunc) {
   }
   
   passport.serializeUser(function(user, done) {
-    done(null, user.id);
+    done(null, user.id || user._id);
   });
 
   passport.deserializeUser(function(id, done) {
@@ -53,8 +51,8 @@ module.exports = function (userModel, redirectCB, strategyFunc) {
 
   function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) { return next(); }
-    res.status(403);
-    next(403);
+    res.status(401);
+    next(401);
   };
 
   function ensureAdmin(req, res, next) {
@@ -82,8 +80,8 @@ module.exports = function (userModel, redirectCB, strategyFunc) {
       if (err) { return next(err) }
       if (!user) {
         req.session.messages =  [info.message];
-        res.status(401);
-        next(401);
+        res.status(403);
+        next(403);
       }
       req.logIn(user, function(err) {
         if (err) { return next(err); }
@@ -99,12 +97,6 @@ module.exports = function (userModel, redirectCB, strategyFunc) {
 
     createUser : createUser,
     
-    login: login,
-    
-    initialize: passport.initialize,
-    
-    session: passport.session,
-    
-    passport: passport
+    login: login
   };
 }

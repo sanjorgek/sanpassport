@@ -30,20 +30,21 @@ var UserModel = mongoose.model('User', userSchema);
 
 ## Use
 ~~~js
+var passport = require('passport');
 //optional
 var redirectCb = function(req, res){
   //...
 };
 //optional
-var strategyFun = function(username, password, done){
+var strategyFun = function(passport, username, password, done){
   //...
 };
 var sanpassport = require('sanpassport')(UserModel, redirectCb, strategyFun);
 ~~~
 Then you can use, example with [express.js](http://expressjs.com/):
 ~~~js
-app.use(sanpassport.initialize());
-app.use(sanpassport.session());
+app.use(passport.initialize());
+app.use(passport.session());
 //...
 app.post("/login", sanpassport.login);
 app.post("/secure/route", sanpassport.ensureAuthenticated, function(req, res){

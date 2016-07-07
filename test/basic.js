@@ -1,5 +1,6 @@
 var sanpassport;
 var app;
+var userModel;
 var request = require('supertest');
 
 describe('Basic tests ::', function() {
@@ -8,7 +9,7 @@ describe('Basic tests ::', function() {
 		var passport = require('passport');
 		
 		// Database connect
-		var uristring = "mongodb://localhost:27017/sanjorge";
+		var uristring = "mongodb://localhost:27017/sanpassport";
 		
 		var mongoOptions = { db: { safe: true }};
 		
@@ -25,42 +26,26 @@ describe('Basic tests ::', function() {
 		// se usa un Schema para crear la estructura de lo necesario para registrar un usuario
 		var userSchema = new Schema({
 			username: { type: String, required: true, unique: true },
-			name: {type: String, required: true},
-			apaterno: {type: String, required: true},
-			amaterno: {type: String, required: true},
 			email: { type: String, required: true, unique: true },
 			password: { type: String, required: true},
 			admin: { type: Boolean, required: true }
 		});
 		
-		
-		// Uso del metodo para encriptar los passwords
-		userSchema.pre('save', function(next) {
-			var user = this;
-		
-			if(!user.isModified('password')) return next();
-		
-			bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-				if(err) return next(err);
-		
-				bcrypt.hash(user.password, salt, function(err, hash) {
-					if(err) return next(err);
-					user.password = hash;
-					next();
-				});
-			});
-		});
-		
 		// Metodo para comparar el pass dado por el usuario y el encriptado que esta en al base de datos
 		userSchema.methods.comparePassword = function(candidatePassword, cb) {
-			bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-				if(err) return cb(err);
-				cb(null, isMatch);
-			});
+			cb(null, candidatePassword==this.password);
 		};
 		
 		// Exportamos el modelo usado para crear los usuarios
-		var userModel = mongoose.model('User', userSchema);
+		userModel = mongoose.model('User', userSchema);
+		
+		userModel.findOne({ username: "sanjorgek" }, function(err, user) {
+			if(!err && !user) userModel.create({username: "sanjorgek", password: "12345678", email: "sanjorgek@prueba.com", admin: true}, function(err, user) {});
+		});
+		
+		userModel.findOne({ username: "notadmin" }, function(err, user) {
+			if(!err && !user) userModel.create({username: "notadmin", password: "12345678", email: "notadmin@prueba.com", admin: false}, function(err, user) {});
+		});
 		
 		sanpassport = require('../')(passport, userModel);
 
@@ -96,6 +81,12 @@ describe('Basic tests ::', function() {
 			res.send(200);
 		});
 		
+		app.get('/notAdmin', sanpassport.ensureAdmin, function (req, res, next) {
+			res.send(200);
+		});
+		
+		app.post('/login', sanpassport.login);
+		
 		// catch 404 and forward to error handler
 		app.use(function(req, res, next) {
 			var err = new Error('Not found.');
@@ -106,9 +97,15 @@ describe('Basic tests ::', function() {
 		// development error handler
 		// will print stacktrace
 		app.use(function(err, req, res, next) {
-				if(err.view) err.status = 405;
-				res.status(err.status || 500);
+			if(err.status){
+				res.send(err.status);
+			}else if(err.view){
+				err.status = 405;
+				res.status(err.status || err);
 				res.redirect("/");
+			}else if(err){
+				res.send(err);
+			}else res.send(400);
 		});
 		
 		app.listen(1337, function () {
@@ -131,10 +128,74 @@ describe('Basic tests ::', function() {
 	
 	it("dont auth", function (done) {
 		request(app).get('/notAuth')
-		.expect(302)
+		.expect(401)
 		.end(function (err, res) {
 			if(err) done(err);
 			else done();
+		});
+	});
+	
+	describe('#login()', function () {
+		it("login empty", function (done) {
+			request(app).post('/login')
+			.send({})
+			.expect(403)
+			.end(function (err, res) {
+				if(err) done(err);
+				else done();
+			});
+		});
+		
+		it("login empty2", function (done) {
+			request(app).post('/login')
+			.send({username: "", password: ""})
+			.expect(403)
+			.end(function (err, res) {
+				if(err) done(err);
+				else done();
+			});
+		});
+		
+		it("login empty3", function (done) {
+			request(app).post('/login')
+			.send({username: "fefe", password: ""})
+			.expect(403)
+			.end(function (err, res) {
+				if(err) done(err);
+				else done();
+			});
+		});
+		
+		it("bad password", function (done) {
+			request(app).post('/login')
+			.send({username: "sanjorgek", password: "wsdfw"})
+			.expect(403)
+			.end(function (err, res) {
+				if(err) done(err);
+				else done();
+			});
+		});
+		
+		it("good password", function (done) {
+			request(app).post('/login')
+			.send({username: "sanjorgek", password: "12345678"})
+			.expect(302)
+			.end(function (err, res) {
+				if(err) done(err);
+				else done();
+			});
+		});
+	});
+	
+	describe('#enshureAdmin()', function () {
+		it("not admin", function (done) {
+			request(app).post('/notAdmin')
+			.send({username: "notadmin", password: "12345678"})
+			.expect(404)
+			.end(function (err, res) {
+				if(err) done(err);
+				else done();
+			});
 		});
 	});
 });
