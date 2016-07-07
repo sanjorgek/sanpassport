@@ -6,7 +6,6 @@ var request = require('supertest');
 describe('Basic tests ::', function() {
 	before(function (done) {
 		var mongoose = require('mongoose');
-		var passport = require('passport');
 		
 		// Database connect
 		var uristring = "mongodb://localhost:27017/sanpassport";
@@ -47,7 +46,7 @@ describe('Basic tests ::', function() {
 			if(!err && !user) userModel.create({username: "notadmin", password: "12345678", email: "notadmin@prueba.com", admin: false}, function(err, user) {});
 		});
 		
-		sanpassport = require('../')(passport, userModel);
+		sanpassport = require('../')(userModel);
 
 		var express = require('express');
 		
@@ -69,8 +68,8 @@ describe('Basic tests ::', function() {
 				}
 			)
 		);
-		app.use(passport.initialize());
-		app.use(passport.session());
+		app.use(sanpassport.initialize);
+		app.use(sanpassport.session);
 		app.use(app.router);
 		
 		app.get('/', function (req, res, next) {
