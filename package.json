@@ -1,6 +1,6 @@
 {
   "name": "sanpassport",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "description": "Passport local adapter",
   "main": "index.js",
   "scripts": {
