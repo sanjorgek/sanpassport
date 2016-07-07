@@ -4,7 +4,7 @@
   "description": "Passport local adapter",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,13 @@
     "url": "https://github.com/sanjorgek/sanpassport/issues"
   },
   "homepage": "https://github.com/sanjorgek/sanpassport#readme",
+  "devDependencies": {
+    "express": "~3.1.0",
+    "mocha": "x",
+    "mongodb": "^2.1.18",
+    "mongoose": "^4.5.0",
+    "supertest": "^1.2.0"
+  },
   "dependencies": {
     "debug": "^2.2.0",
     "passport": "^0.3.2",
