@@ -36,10 +36,10 @@ var redirectCb = function(req, res){
   //...
 };
 //optional
-var strategyFun = function(passport, username, password, done){
+var strategyFun = function(username, password, done){
   //...
 };
-var sanpassport = require('sanpassport')(UserModel, redirectCb, strategyFun);
+var sanpassport = require('sanpassport')(passport, UserModel, redirectCb, strategyFun);
 ~~~
 Then you can use, example with [express.js](http://expressjs.com/):
 ~~~js
