@@ -5,11 +5,13 @@
   [![NPM Downloads][downloads-image]][downloads-url]
 
 ## Settings
-First
+In your proyect
 ~~~bash
 $ npm install sanpassport 
 ~~~
-Then you need a valid user model/schema with constructor, findById and findOne functions, also every object need comparePassword and create. One example with mongoose:
+Then you need a valid user model/schema with hisconstructor, findById and findOne functions, also every object need comparePassword and create functions. 
+
+An example with mongoose:
 ~~~js
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
@@ -26,21 +28,19 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
   //do things
 };
 var UserModel = mongoose.model('User', userSchema);
-~~~
-
-## Use
-~~~js
 //optional
 var redirectCb = function(req, res){
   //...
 };
 //optional
-var strategyFun = function(username, password, done){
+var strategyFunc = function(username, password, done){
   //...
 };
-var sanpassport = require('sanpassport')(UserModel, redirectCb, strategyFun);
+var sanpassport = require('sanpassport')(UserModel, redirectCb, strategyFunc);
 ~~~
-Then you can use, example with [express.js](http://expressjs.com/):
+
+## Use
+An example with [express.js](http://expressjs.com/):
 ~~~js
 app.use(sanpassport.initialize);
 app.use(sanpassport.session);
@@ -63,6 +63,7 @@ app.post("/signin", function(req, res){
   });
 });
 ~~~
+See `test/basic.js` for more details.
 
 
 [npm-image]: https://img.shields.io/npm/v/sanpassport.svg

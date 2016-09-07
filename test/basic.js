@@ -53,7 +53,7 @@ describe('Basic tests ::', function() {
 		app = express();
 		
 		app.use(express.static( "public" ) );
-		app.use(express.logger());
+		//app.use(express.logger());
 		app.use(express.cookieParser());
 		app.use(express.bodyParser());
 		app.use(express.methodOverride());
@@ -76,11 +76,11 @@ describe('Basic tests ::', function() {
 			res.send(200);
 		});
 		
-		app.get('/notAuth', sanpassport.ensureAuthenticated, function (req, res, next) {
+		app.get('/needAuth', sanpassport.ensureAuthenticated, function (req, res, next) {
 			res.send(200);
 		});
 		
-		app.get('/notAdmin', sanpassport.ensureAdmin, function (req, res, next) {
+		app.get('/needAdmin', sanpassport.ensureAdmin, function (req, res, next) {
 			res.send(200);
 		});
 		
@@ -126,7 +126,7 @@ describe('Basic tests ::', function() {
 	});
 	
 	it("dont auth", function (done) {
-		request(app).get('/notAuth')
+		request(app).get('/needAuth')
 		.expect(401)
 		.end(function (err, res) {
 			if(err) done(err);
@@ -134,67 +134,76 @@ describe('Basic tests ::', function() {
 		});
 	});
 	
-	describe('#login()', function () {
-		it("login empty", function (done) {
-			request(app).post('/login')
-			.send({})
-			.expect(403)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
-		});
-		
-		it("login empty2", function (done) {
-			request(app).post('/login')
-			.send({username: "", password: ""})
-			.expect(403)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
-		});
-		
-		it("login empty3", function (done) {
-			request(app).post('/login')
-			.send({username: "fefe", password: ""})
-			.expect(403)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
-		});
-		
-		it("bad password", function (done) {
-			request(app).post('/login')
-			.send({username: "sanjorgek", password: "wsdfw"})
-			.expect(403)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
-		});
-		
-		it("good password", function (done) {
-			request(app).post('/login')
-			.send({username: "sanjorgek", password: "12345678"})
-			.expect(302)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
+	it("login empty", function (done) {
+		request(app).post('/login')
+		.send({})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
 		});
 	});
 	
-	describe('#enshureAdmin()', function () {
-		it("not admin", function (done) {
-			request(app).post('/notAdmin')
-			.send({username: "notadmin", password: "12345678"})
-			.expect(404)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
+	it("login empty2", function (done) {
+		request(app).post('/login')
+		.send({username: "", password: ""})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+	
+	it("login empty3", function (done) {
+		request(app).post('/login')
+		.send({username: "fefe", password: ""})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+	
+	it("bad password", function (done) {
+		request(app).post('/login')
+		.send({username: "sanjorgek", password: "wsdfw"})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+	
+	it("good password", function (done) {
+		request(app).post('/login')
+		.send({username: "sanjorgek", password: "12345678"})
+		.expect(302)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+	it("not admin", function (done) {
+		request(app).get('/needAdmin')
+		.expect(401)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+  it("admin", function (done) {
+		request(app).post('/login')
+		.send({username: "sanjorgek", password: "12345678"})
+		.expect(302)
+		.end(function (err, res) {
+			if(err) done(err);
+			else request(app).get('/needAdmin')
+      .set('Cookie',res.header['set-cookie'])
+      .expect(200)
+      .end(function (err, res) {
+        if(err) done(err);
+        else done();
+      });
 		});
 	});
 });
