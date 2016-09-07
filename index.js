@@ -59,7 +59,6 @@ module.exports = function (userModel, redirectCB, strategyFunc) {
   };
 
   function ensureAdmin(req, res, next) {
-    console.log(req);
     if(req.user && req.user.admin === true) next();
     else{
         res.status(401);
