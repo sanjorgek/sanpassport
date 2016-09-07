@@ -1,7 +1,7 @@
 {
   "name": "sanpassport",
   "version": "2.0.0",
-  "description": "Passport local adapter",
+  "description": "Passport and passport-local simple adapter",
   "main": "index.js",
   "scripts": {
     "test": "mocha"

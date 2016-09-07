@@ -47,13 +47,13 @@ describe('Basic tests ::', function() {
 		});
 		
 		sanpassport = require('../')(userModel);
-
+		console.log(sanpassport);
 		var express = require('express');
 		
 		app = express();
 		
 		app.use(express.static( "public" ) );
-		app.use(express.logger());
+		//app.use(express.logger());
 		app.use(express.cookieParser());
 		app.use(express.bodyParser());
 		app.use(express.methodOverride());
@@ -134,67 +134,61 @@ describe('Basic tests ::', function() {
 		});
 	});
 	
-	describe('#login()', function () {
-		it("login empty", function (done) {
-			request(app).post('/login')
-			.send({})
-			.expect(403)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
-		});
-		
-		it("login empty2", function (done) {
-			request(app).post('/login')
-			.send({username: "", password: ""})
-			.expect(403)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
-		});
-		
-		it("login empty3", function (done) {
-			request(app).post('/login')
-			.send({username: "fefe", password: ""})
-			.expect(403)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
-		});
-		
-		it("bad password", function (done) {
-			request(app).post('/login')
-			.send({username: "sanjorgek", password: "wsdfw"})
-			.expect(403)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
-		});
-		
-		it("good password", function (done) {
-			request(app).post('/login')
-			.send({username: "sanjorgek", password: "12345678"})
-			.expect(302)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
+	it("login empty", function (done) {
+		request(app).post('/login')
+		.send({})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
 		});
 	});
 	
-	describe('#enshureAdmin()', function () {
-		it("not admin", function (done) {
-			request(app).post('/notAdmin')
-			.send({username: "notadmin", password: "12345678"})
-			.expect(404)
-			.end(function (err, res) {
-				if(err) done(err);
-				else done();
-			});
+	it("login empty2", function (done) {
+		request(app).post('/login')
+		.send({username: "", password: ""})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+	
+	it("login empty3", function (done) {
+		request(app).post('/login')
+		.send({username: "fefe", password: ""})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+	
+	it("bad password", function (done) {
+		request(app).post('/login')
+		.send({username: "sanjorgek", password: "wsdfw"})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+	
+	it("good password", function (done) {
+		request(app).post('/login')
+		.send({username: "sanjorgek", password: "12345678"})
+		.expect(302)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+	it("not admin", function (done) {
+		request(app).get('/notAdmin')
+		.expect(401)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
 		});
 	});
 });

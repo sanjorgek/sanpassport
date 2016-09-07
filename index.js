@@ -39,7 +39,9 @@ module.exports = function (userModel, redirectCB, strategyFunc) {
   }
   
   passport.serializeUser(function(user, done) {
-    done(null, user.id || user._id);
+    if(!user) done(new Error("bad user"));
+    else if(user._id!=null) done(null, user._id);
+    else done(null, user.id);
   });
 
   passport.deserializeUser(function(id, done) {
@@ -57,10 +59,11 @@ module.exports = function (userModel, redirectCB, strategyFunc) {
   };
 
   function ensureAdmin(req, res, next) {
+    console.log(req);
     if(req.user && req.user.admin === true) next();
     else{
-        res.status(405);
-        next(405);
+        res.status(401);
+        next(401);
     }
   };
 
