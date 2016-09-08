@@ -67,15 +67,19 @@ module.exports = function (userModel, redirectCB, strategyFunc) {
   };
 
   function createUser(userJson, done) {
-    var result = zxcvbn(userJson.password);
-    if (result.score < MIN_PASSWORD_SCORE) return done(new Error("Password is too simple"));
-    userModel.create(userJson, function(err, user) {
-        if(err) {
-            done(err);
-        } else {
-            done(null, user);
-        }
-    });
+    if(userJson.password){
+      var result = zxcvbn(userJson.password);
+      if (result.score < MIN_PASSWORD_SCORE) return done(new Error("Password is too simple"));
+      userModel.create(userJson, function(err, user) {
+          if(err) {
+              done(err);
+          } else {
+              done(null, user);
+          }
+      });
+    }else{
+      done(new Error("Missing password"));
+    }
   };
   
   function login(req, res, next) {
