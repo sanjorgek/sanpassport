@@ -5,11 +5,11 @@
   [![NPM Downloads][downloads-image]][downloads-url]
 
 ## Settings
-In your proyect
+Add sanpassport to your app
 ~~~bash
 $ npm install sanpassport 
 ~~~
-Then you need a valid user model/schema with hisconstructor, findById and findOne functions, also every object need comparePassword and create functions. 
+Then you need a valid user model/schema with his constructor, findById and findOne async-functions, also every object need comparePassword and create async-functions. 
 
 An example with mongoose:
 ~~~js
