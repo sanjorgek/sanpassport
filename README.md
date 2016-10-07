@@ -36,7 +36,11 @@ var redirectCb = function(req, res){
 var strategyFunc = function(username, password, done){
   //...
 };
-var sanpassport = require('sanpassport')(UserModel, redirectCb, strategyFunc);
+//optional
+var ensureAuthenticated = function(req, res, next){
+  //...
+};
+var sanpassport = require('sanpassport')(UserModel, redirectCb, strategyFunc, ensureAuthenticated);
 ~~~
 
 ## Use

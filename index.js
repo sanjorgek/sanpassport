@@ -5,7 +5,7 @@ var passport = require('passport')
 
 const MIN_PASSWORD_SCORE = 2;
 
-module.exports = function (userModel, redirectCB, strategyFunc) {
+module.exports = function (userModel, redirectCB, strategyFunc, ensureAuthenticated) {
   if(!redirectCB || (typeof redirectCB != 'function')){
     redirectCB = function (req, res) {
       res.redirect("/");
@@ -52,11 +52,13 @@ module.exports = function (userModel, redirectCB, strategyFunc) {
 
   passport.use(new LocalStrategy(strategyFunc));
 
-  function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) { return next(); }
-    res.status(401);
-    next(401);
-  };
+  if(!ensureAuthenticated ||(typeof ensureAuthenticated != 'function')){
+    ensureAuthenticated = function(req, res, next) {
+      if (req.isAuthenticated()) { return next(); }
+      res.status(401);
+      next(401);
+    };
+  }
 
   function ensureAdmin(req, res, next) {
     if(req.user && req.user.admin === true) next();
