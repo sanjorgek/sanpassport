@@ -5,7 +5,7 @@ var passport = require('passport')
 
 const MIN_PASSWORD_SCORE = 2;
 
-module.exports = function (userModel, redirectCB, strategyFunc, ensureAuthenticated) {
+module.exports = function (userModel, redirectCB, strategyFunc, ensureAuthenticated, logout) {
   if(!redirectCB || (typeof redirectCB != 'function')){
     redirectCB = function (req, res) {
       res.redirect("/");
@@ -99,6 +99,15 @@ module.exports = function (userModel, redirectCB, strategyFunc, ensureAuthentica
     })(req, res, next);
   };
 
+  if(!logout || (typeof logout != 'function')){
+    logout = function (req, res) {
+      if(req.user){
+        req.logout();
+      }
+      res.redirect('/login');
+    };
+  }
+
   return {
     ensureAuthenticated: ensureAuthenticated,
 
@@ -110,6 +119,8 @@ module.exports = function (userModel, redirectCB, strategyFunc, ensureAuthentica
     
     initialize: passport.initialize(),
     
-    session: passport.session()
+    session: passport.session(),
+
+    logout: logout
   };
 }

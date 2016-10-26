@@ -85,6 +85,8 @@ describe('Basic tests ::', function() {
 		});
 		
 		app.post('/login', sanpassport.login);
+
+		app.post('/logout', sanpassport.logout);
 		
 		// catch 404 and forward to error handler
 		app.use(function(req, res, next) {
@@ -181,6 +183,24 @@ describe('Basic tests ::', function() {
 		.end(function (err, res) {
 			if(err) done(err);
 			else done();
+		});
+	});
+  it("good password2", function (done) {
+		request(app).post('/login')
+		.send({username: "sanjorgek", password: "12345678"})
+		.expect(302)
+		.end(function (err, res) {
+			if(err) done(err);
+			else request(app).post('/logout')
+        .set('Cookie',res.header['set-cookie'])
+        .expect(302)
+        .end(function (err, res) {
+          if(err) done(err);
+          else{
+            if(res.res.text!="Found. Redirecting to /login") done("Redirect won't match");
+            else done();
+          }
+        });
 		});
 	});
 	it("not admin", function (done) {
