@@ -1,8 +1,12 @@
 # sanpassport
-[Passport](https://www.npmjs.com/package/passport) and [passport-local](https://www.npmjs.com/package/passport-local) simple adapter
 
   [![NPM Version][npm-image]][npm-url]
-  [![NPM Downloads][downloads-image]][downloads-url]
+  [![NPM Downloads][downloads-month]][downloads-url]
+
+## About
+[Passport](https://www.npmjs.com/package/passport) and [passport-local](https://www.npmjs.com/package/passport-local) wrapper
+
+  [![NPM][downloads-chart]][chart-url]
 
 ## Settings
 Add sanpassport to your app
@@ -29,18 +33,22 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
 };
 var UserModel = mongoose.model('User', userSchema);
 //optional
-var redirectCb = function(req, res){
+function redirectCb(req, res){
   //...
 };
 //optional
-var strategyFunc = function(username, password, done){
+function strategyFunc(username, password, done){
   //...
 };
 //optional
-var ensureAuthenticated = function(req, res, next){
+function ensureAuthenticated(req, res, next){
   //...
 };
-var sanpassport = require('sanpassport')(UserModel, redirectCb, strategyFunc, ensureAuthenticated);
+//optional
+function logout(req, res, next){
+
+}
+var sanpassport = require('sanpassport')(UserModel, redirectCb, strategyFunc, ensureAuthenticated, logout);
 ~~~
 
 ## Use
@@ -50,6 +58,7 @@ app.use(sanpassport.initialize);
 app.use(sanpassport.session);
 //...
 app.post("/login", sanpassport.login);
+app.post("/logout", sanpassport.logout);
 app.post("/secure/route", sanpassport.ensureAuthenticated, function(req, res){
   //...
 });
@@ -72,5 +81,7 @@ See `test/basic.js` for more details.
 
 [npm-image]: https://img.shields.io/npm/v/sanpassport.svg
 [npm-url]: https://npmjs.org/package/sanpassport
-[downloads-image]: https://img.shields.io/npm/dm/sanpassport.svg
+[downloads-month]: https://img.shields.io/npm/dm/sanpassport.svg
 [downloads-url]: https://npmjs.org/package/sanpassport
+[downloads-chart]: https://nodei.co/npm-dl/sanpassport.png?months=6&height=1
+[chart-url]: https://nodei.co/npm/sanpassport/
