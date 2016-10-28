@@ -4,12 +4,12 @@
   [![NPM Downloads][downloads-month]][downloads-url]
 
 ## About
-[Passport](https://www.npmjs.com/package/passport) and [passport-local](https://www.npmjs.com/package/passport-local) wrapper
+[Passport](https://www.npmjs.com/package/passport) and [passport-local](https://www.npmjs.com/package/passport-local) wrapper.
 
   [![NPM][downloads-chart]][chart-url]
 
 ## Settings
-Add sanpassport to your app
+Install sanpassport
 ~~~bash
 $ npm install sanpassport 
 ~~~
@@ -29,26 +29,44 @@ var userSchema = new Schema({
   admin: { type: Boolean, required: true }
 });
 userSchema.methods.comparePassword = function(candidatePassword, cb) {
-  //do things
+  // do things
+  var isMatch = this.password == isMatch;
+  cb(null, isMatch);
 };
+
 var UserModel = mongoose.model('User', userSchema);
-//optional
-function redirectCb(req, res){
+
+//optional, in case of successful login
+function redirectCb(req, res, next){
   //...
 };
-//optional
-function strategyFunc(username, password, done){
-  //...
-};
+
 //optional
 function ensureAuthenticated(req, res, next){
   //...
 };
-//optional
-function logout(req, res, next){
 
-}
-var sanpassport = require('sanpassport')(UserModel, redirectCb, strategyFunc, ensureAuthenticated, logout);
+//optional, see http://passportjs.org/docs/configure
+// option1
+function strategyFunc(username, password, done){
+  //...
+};
+var sanpassport = require('sanpassport')(
+  UserModel, 
+  strategyFunc, 
+  ensureAuthenticated);
+// option2
+var strategyJson = {
+  func: strategyFunc,
+  options: {
+    usernameField: 'email',
+    passwordField: 'password'
+  }
+};
+var sanpassport = require('sanpassport')(
+  UserModel, 
+  strategyJson, 
+  ensureAuthenticated);
 ~~~
 
 ## Use
@@ -57,12 +75,13 @@ An example with [express.js](http://expressjs.com/):
 app.use(sanpassport.initialize);
 app.use(sanpassport.session);
 //...
-app.post("/login", sanpassport.login);
-app.post("/logout", sanpassport.logout);
-app.post("/secure/route", sanpassport.ensureAuthenticated, function(req, res){
+app.post("/login", sanpassport.login, function(req, res, next){
   //...
 });
-app.get("/adm/route", sanpassport.ensureAdmin, function(req, res){
+app.post("/logout", sanpassport.logout, function(req, res, next){
+  //...
+});
+app.post("/secure/route", sanpassport.ensureAuthenticated, function(req, res){
   //...
 });
 app.post("/signin", function(req, res){

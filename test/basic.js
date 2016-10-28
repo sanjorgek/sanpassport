@@ -71,22 +71,18 @@ describe('Basic tests ::', function() {
 		app.use(sanpassport.initialize);
 		app.use(sanpassport.session);
 		app.use(app.router);
-		
-		app.get('/', function (req, res, next) {
-			res.send(200);
-		});
-		
-		app.get('/needAuth', sanpassport.ensureAuthenticated, function (req, res, next) {
-			res.send(200);
-		});
-		
-		app.get('/needAdmin', sanpassport.ensureAdmin, function (req, res, next) {
-			res.send(200);
-		});
-		
-		app.post('/login', sanpassport.login);
 
-		app.post('/logout', sanpassport.logout);
+    function success (req, res) {
+      return res.send(200);
+    };
+		
+		app.get('/', success);
+		
+		app.get('/needAuth', sanpassport.ensureAuthenticated, success);
+			
+		app.post('/login', sanpassport.login, success);
+
+		app.post('/logout', sanpassport.logout, success);
 		
 		// catch 404 and forward to error handler
 		app.use(function(req, res, next) {
@@ -201,29 +197,6 @@ describe('Basic tests ::', function() {
             else done();
           }
         });
-		});
-	});
-	it("not admin", function (done) {
-		request(app).get('/needAdmin')
-		.expect(401)
-		.end(function (err, res) {
-			if(err) done(err);
-			else done();
-		});
-	});
-  it("admin", function (done) {
-		request(app).post('/login')
-		.send({username: "sanjorgek", password: "12345678"})
-		.expect(302)
-		.end(function (err, res) {
-			if(err) done(err);
-			else request(app).get('/needAdmin')
-      .set('Cookie',res.header['set-cookie'])
-      .expect(200)
-      .end(function (err, res) {
-        if(err) done(err);
-        else done();
-      });
 		});
 	});
 });
