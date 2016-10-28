@@ -5,37 +5,30 @@ var passport = require('passport')
 
 const MIN_PASSWORD_SCORE = 2;
 
-module.exports = function (userModel, redirectCB, strategyFunc, ensureAuthenticated, logout) {
-  if(!redirectCB || (typeof redirectCB != 'function')){
-    redirectCB = function (req, res) {
-      res.redirect("/");
-    }
-  }
+module.exports = function (userModel, strategyFunc, ensureAuthenticated) {
   
-  if(!strategyFunc || (typeof strategyFunc != 'function')){
-    strategyFunc = function(username, password, done) {
-      userModel.findOne({ username: username }, function(err, user) {
-        if (err) {
+  function optStrategyFunc(username, password, done) {
+    userModel.findOne({ username: username }, function(err, user) {
+      if (err) {
+        debug(err);
+        return done(err);
+      }
+      if (!user) {
+        return done(null, false, { message: 'Unknown user ' + username });
+      }
+      user.comparePassword(password, function(err, isMatch) {
+        if (err){
           debug(err);
           return done(err);
         }
-        if (!user) {
-          return done(null, false, { message: 'Unknown user ' + username });
+        if(isMatch) {
+          return done(null, user);
+        } else {
+          debug("don't match");
+          return done(null, false, { message: 'Invalid password' });
         }
-        user.comparePassword(password, function(err, isMatch) {
-          if (err){
-            debug(err);
-            return done(err);
-          }
-          if(isMatch) {
-            return done(null, user);
-          } else {
-            debug("don't match");
-            return done(null, false, { message: 'Invalid password' });
-          }
-        });
       });
-    }
+    });
   }
   
   passport.serializeUser(function(user, done) {
@@ -50,7 +43,13 @@ module.exports = function (userModel, redirectCB, strategyFunc, ensureAuthentica
     });
   });
 
-  passport.use(new LocalStrategy(strategyFunc));
+  if(strategyFunc &&  (typeof strategyFunc === 'function')){
+    passport.use(new LocalStrategy(strategyFunc));
+  }else if(strategyFunc &&  (typeof strategyFunc === 'object')){
+    passport.use(new LocalStrategy(strategyFunc.options, strategyFunc.func));    
+  }else{
+    passport.use(new LocalStrategy(optStrategyFunc));
+  }
 
   if(!ensureAuthenticated ||(typeof ensureAuthenticated != 'function')){
     ensureAuthenticated = function(req, res, next) {
@@ -94,24 +93,20 @@ module.exports = function (userModel, redirectCB, strategyFunc, ensureAuthentica
       }
       req.logIn(user, function(err) {
         if (err) { return next(err); }
-        return redirectCB(req, res);
+        return next();
       });
     })(req, res, next);
   };
 
-  if(!logout || (typeof logout != 'function')){
-    logout = function (req, res) {
-      if(req.user){
-        req.logout();
-      }
-      res.redirect('/login');
-    };
+  function logout (req, res, next) {
+    if(req.user){
+      req.logout();
+    }
+    next();
   }
 
   return {
     ensureAuthenticated: ensureAuthenticated,
-
-    ensureAdmin: ensureAdmin,
 
     createUser : createUser,
     
