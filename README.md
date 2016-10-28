@@ -2,6 +2,7 @@
 
   [![NPM Version][npm-image]][npm-url]
   [![NPM Downloads][downloads-month]][downloads-url]
+  [![Build Status](https://travis-ci.org/sanjorgek/sanpassport.svg?branch=master)](https://travis-ci.org/sanjorgek/sanpassport)
 
 ## About
 [Passport](https://www.npmjs.com/package/passport) and [passport-local](https://www.npmjs.com/package/passport-local) wrapper.
