@@ -37,11 +37,6 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
 
 var UserModel = mongoose.model('User', userSchema);
 
-//optional, in case of successful login
-function redirectCb(req, res, next){
-  //...
-};
-
 //optional
 function ensureAuthenticated(req, res, next){
   //...
@@ -97,6 +92,53 @@ app.post("/signin", function(req, res){
 });
 ~~~
 See `test/basic.js` for more details.
+
+## To Do
+
+- [ ] Strategies
+  - [x] Local
+  - [ ] Facebook
+  - [ ] Twitter
+  - [ ] OAuth
+- [ ] New Strategy
+
+## Changelog
+
+### [3.0.0](https://github.com/sanjorgek/sanpassport/tree/1b25fe6e5359c16c6b998948f85bc57aac1b9930) (27-10-2016)
+
+* Travis integration.
+* Logout removed as param.
+* Strategy Local options added as params.
+
+
+### [2.2.0](https://github.com/sanjorgek/sanpassport/tree/052131af5834d2bec9d55b49e5cbab45f8e263bb) (26-10-2016)
+
+* Logout function added as param.
+
+### [2.1.0](https://github.com/sanjorgek/sanpassport/tree/9cacdcfdc7d2c9ed379c94789dee8f43e3736f9c) (7-10-2016)
+
+* ensureAuthenticated functions added as param.
+
+### [2.0.2](https://github.com/sanjorgek/sanpassport/tree/6784fbbffd515f87be2246cbc521161085a8f6f9) (8-9-2016) 
+
+* Password validation.
+
+### [2.0.1](https://github.com/sanjorgek/sanpassport/tree/a20e2d1b8b0a0ba8af6a3a8e667dd2f771c42f80) (7-9-2016) 
+
+* Strategy Function added as param.
+* Passport dependencie and removed as param.
+* Serialize user with id or _id.
+* Model create method beside new instance.
+* Test module
+
+### [1.4.0](https://github.com/sanjorgek/sanpassport/tree/110fdaadad1de9ef10d8bb5847f0fa29ee358d7a) (25-7-2016) 
+
+* README with examples.
+
+### [1.0.0](https://github.com/sanjorgek/sanpassport/tree/f131338f16829c32063a18761ca0463b07432a4f) (12-06-2016) 
+
+Start
+ 
 
 
 [npm-image]: https://img.shields.io/npm/v/sanpassport.svg
