@@ -2,7 +2,7 @@
 
   [![NPM Version][npm-image]][npm-url]
   [![NPM Downloads][downloads-month]][downloads-url]
-  [![Build Status](https://travis-ci.org/sanjorgek/sanpassport.svg?branch=master)](https://travis-ci.org/sanjorgek/sanpassport)
+  [![Build Status][travis-image]][travis-url]
 
 ## About
 [Passport](https://www.npmjs.com/package/passport) and [passport-local](https://www.npmjs.com/package/passport-local) wrapper.
@@ -11,13 +11,15 @@
 
 ## Settings
 Install sanpassport
-~~~bash
+
+```bash
 $ npm install sanpassport 
-~~~
+```
 Then you need a valid user model/schema with his constructor, findById and findOne async-functions, also every object need comparePassword and create async-functions. 
 
 An example with mongoose:
-~~~js
+
+```js
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var userSchema = new Schema({
@@ -63,11 +65,12 @@ var sanpassport = require('sanpassport')(
   UserModel, 
   strategyJson, 
   ensureAuthenticated);
-~~~
+```
 
 ## Use
 An example with [express.js](http://expressjs.com/):
-~~~js
+
+```js
 app.use(sanpassport.initialize);
 app.use(sanpassport.session);
 //...
@@ -90,7 +93,8 @@ app.post("/signin", function(req, res){
     }
   });
 });
-~~~
+```
+
 See `test/basic.js` for more details.
 
 ## To Do
@@ -147,3 +151,5 @@ Start
 [downloads-url]: https://npmjs.org/package/sanpassport
 [downloads-chart]: https://nodei.co/npm-dl/sanpassport.png?months=6&height=1
 [chart-url]: https://nodei.co/npm/sanpassport/
+[travis-image]: https://travis-ci.org/sanjorgek/sanpassport.svg?branch=master
+[travis-url]: https://travis-ci.org/sanjorgek/sanpassport
