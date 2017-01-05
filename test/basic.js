@@ -2,7 +2,10 @@ var sanpassport;
 var app;
 var userModel;
 var request = require('supertest');
-
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
+var expressSession = require('express-session');
 var mongoose = require('mongoose');
 		
 // Database connect
@@ -55,11 +58,11 @@ describe('Basic tests ::', function() {
 		
 		app.use(express.static( "public" ) );
 		//app.use(express.logger());
-		app.use(express.cookieParser());
-		app.use(express.bodyParser());
-		app.use(express.methodOverride());
+		app.use(cookieParser());
+		app.use(bodyParser());
+		app.use(methodOverride());
 		app.use(
-			express.session(
+			expressSession(
 				{
 					name: 'EncuentrosDiscretosCart',
 					secret: "test",
@@ -71,7 +74,6 @@ describe('Basic tests ::', function() {
 		);
 		app.use(sanpassport.initialize);
 		app.use(sanpassport.session);
-		app.use(app.router);
 
     function success (req, res) {
       return res.send(200);
@@ -243,11 +245,11 @@ describe('Optional test::', function() {
 		
 		app.use(express.static( "public" ) );
 		//app.use(express.logger());
-		app.use(express.cookieParser());
-		app.use(express.bodyParser());
-		app.use(express.methodOverride());
+		app.use(cookieParser());
+		app.use(bodyParser());
+		app.use(methodOverride());
 		app.use(
-			express.session(
+			expressSession(
 				{
 					name: 'EncuentrosDiscretosCart',
 					secret: "test",
@@ -259,7 +261,6 @@ describe('Optional test::', function() {
 		);
 		app.use(sanpassport.initialize);
 		app.use(sanpassport.session);
-		app.use(app.router);
 
     function success (req, res) {
       return res.send(200);

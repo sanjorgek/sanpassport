@@ -1,7 +1,7 @@
-var passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
-  , debug = require('debug')('sanpassport')
-  , zxcvbn = require("zxcvbn");
+var passport = require('passport'),
+  LocalStrategy = require('passport-local').Strategy,
+  debug = require('debug')('sanpassport'),
+  zxcvbn = require("zxcvbn");
 
 const MIN_PASSWORD_SCORE = 2;
 
@@ -33,7 +33,7 @@ module.exports = function (userModel, strategyFunc, ensureAuthenticated) {
   
   passport.serializeUser(function(user, done) {
     if(!user) done(new Error("bad user"));
-    else if(user._id!=null) done(null, user._id);
+    else if(user._id!==null) done(null, user._id);
     else done(null, user.id);
   });
 
@@ -65,7 +65,7 @@ module.exports = function (userModel, strategyFunc, ensureAuthenticated) {
         res.status(401);
         next(401);
     }
-  };
+  }
 
   function createUser(userJson, done) {
     if(userJson.password){
@@ -81,11 +81,11 @@ module.exports = function (userModel, strategyFunc, ensureAuthenticated) {
     }else{
       done(new Error("Missing password"));
     }
-  };
+  }
   
   function login(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
-      if (err) { return next(err) }
+      if (err) { return next(err); }
       if (!user) {
         req.session.messages =  [info.message];
         res.status(403);
@@ -96,7 +96,7 @@ module.exports = function (userModel, strategyFunc, ensureAuthenticated) {
         return next();
       });
     })(req, res, next);
-  };
+  }
 
   function logout (req, res, next) {
     if(req.user){
@@ -118,4 +118,4 @@ module.exports = function (userModel, strategyFunc, ensureAuthenticated) {
 
     logout: logout
   };
-}
+};
