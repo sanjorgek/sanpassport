@@ -9,7 +9,7 @@
   [![bitHound Code](https://www.bithound.io/github/sanjorgek/sanpassport/badges/code.svg)](https://www.bithound.io/github/sanjorgek/sanpassport)
 
 ## About
-[Passport](https://www.npmjs.com/package/passport) and [passport-local](https://www.npmjs.com/package/passport-local) wrapper.
+[Passport](https://www.npmjs.com/package/passport) [passport-local](https://www.npmjs.com/package/passport-local) and [passport-google-oauth](https://www.npmjs.com/package/passport-google-oauth) wrapper.
 
   [![NPM][downloads-chart]][chart-url]
 
@@ -53,22 +53,31 @@ function ensureAuthenticated(req, res, next){
 function strategyFunc(username, password, done){
   //...
 };
-var sanpassport = require('sanpassport')(
-  UserModel, 
-  strategyFunc, 
-  ensureAuthenticated);
-// option2
-var strategyJson = {
-  func: strategyFunc,
-  options: {
-    usernameField: 'email',
-    passwordField: 'password'
-  }
+
+function googleFunc(accessToken, refreshToken, profile, done){
+  //...
 };
-var sanpassport = require('sanpassport')(
-  UserModel, 
-  strategyJson, 
-  ensureAuthenticated);
+var sanpassport = require('sanpassport')([
+  {
+    name: 'local',
+    strategyFunc: strategyFunc,
+    options: {
+      model: UserModel
+      usernameField: 'email',
+      passwordField: 'password'
+    }
+  },
+  {
+    name: 'google-oauth',
+    strategyFunc: googleFunc,
+    options: {
+      clientID: config.oAuth.id,
+      clientSecret: config.oAuth.secret,
+      callbackURL: "/verifyLogin",
+      scope: [/** */]
+    }
+  }
+]);
 ```
 
 ## Use
@@ -77,25 +86,34 @@ An example with [express.js](http://expressjs.com/):
 ```js
 app.use(sanpassport.initialize);
 app.use(sanpassport.session);
-//...
-app.post("/login", sanpassport.login, function(req, res, next){
+//
+app.post("/login", sanpassport.local.login, function(req, res, next){
+  //...
+});
+//
+app.post("/loginGoogle", sanpassport.google.login, function(req, res, next){
   //...
 });
 app.post("/logout", sanpassport.logout, function(req, res, next){
   //...
 });
-app.post("/secure/route", sanpassport.ensureAuthenticated, function(req, res){
-  //...
-});
 app.post("/signin", function(req, res){
   var jsonBody = req.body;
-  sanpassport.createUser(jsonBody, function(err, user){
+  sanpassport.local.createUser(jsonBody, function(err, user){
     if(err || !user){
       res.send(404);
     }else{
       res.send(200);
     }
   });
+});
+
+app.post("/secure/route", sanpassport.local.authenticate, function(req, res){
+  //...
+});
+
+app.get('/verifyLogin', sanpassport.google.authenticate, function(req, res) {
+  //...
 });
 ```
 
@@ -105,6 +123,7 @@ See `test/basic.js` for more details.
 
 - [ ] Strategies
   - [x] Local
+  - [ ] Google OAuth
   - [ ] Facebook
   - [ ] Twitter
   - [ ] OAuth
