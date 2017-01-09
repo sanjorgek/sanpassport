@@ -58,15 +58,31 @@ function googleFunc(accessToken, refreshToken, profile, done){
   //...
 };
 var sanpassport = require('sanpassport')([
+  // Local
+  {
+    name: 'local',
+    strategyFunc: {
+      func: strategyFunc,
+      options: {
+        usernameField: 'email',
+        passwordField: 'password'
+      }
+    },
+    model: UserModel,
+    authenticate: ensureAuthenticated
+  },
+  // or
   {
     name: 'local',
     strategyFunc: strategyFunc,
-    options: {
-      model: UserModel
-      usernameField: 'email',
-      passwordField: 'password'
-    }
+    model: UserModel
   },
+  // or
+  {
+    name: 'local',
+    model: UserModel
+  },
+  // Google
   {
     name: 'google-oauth',
     strategyFunc: googleFunc,
