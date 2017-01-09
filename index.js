@@ -3,6 +3,7 @@ var passport = require('passport'),
   map = require('async/map'),
   asyncify = require('async/asyncify'),
   local = require('./strategies/local');
+  google = require('./strategies/google.js');
 
 module.exports = function(strategiesOps) {
   passport.serializeUser(function(user, done) {
@@ -25,7 +26,7 @@ module.exports = function(strategiesOps) {
 
   var sanpassport = {
     initialize: passport.initialize(),
-    
+
     session: passport.session(),
 
     logout: logout
@@ -33,6 +34,7 @@ module.exports = function(strategiesOps) {
 
   function selectStrategies (opts) {
     if(opts.name==='local') sanpassport.local = local(passport, opts.model, opts.strategyFunc, opts.authenticate);
+    if(opts.name==='google')sanpassport.google = google(passport, opts.strategyFunc, opts.authenticate, opts.config);
   }
 
   map(

@@ -17,9 +17,9 @@
 Install sanpassport
 
 ```bash
-$ npm install sanpassport 
+$ npm install sanpassport
 ```
-Then you need a valid user model/schema with his constructor, findById and findOne async-functions, also every object need comparePassword and create async-functions. 
+Then you need a valid user model/schema with his constructor, findById and findOne async-functions, also every object need comparePassword and create async-functions.
 
 An example with mongoose:
 
@@ -86,11 +86,11 @@ var sanpassport = require('sanpassport')([
   {
     name: 'google-oauth',
     strategyFunc: googleFunc,
-    options: {
-      clientID: config.oAuth.id,
-      clientSecret: config.oAuth.secret,
-      callbackURL: "/verifyLogin",
-      scope: [/** */]
+    authenticate: ensureAuthenticated
+    config: {
+      clientID: "your_client_id",
+      clientSecret: "SHHHH! It's a secret",
+      failureRedirect : "/"
     }
   }
 ]);
@@ -162,11 +162,11 @@ See `test/basic.js` for more details.
 
 * ensureAuthenticated functions added as param.
 
-### [2.0.2](https://github.com/sanjorgek/sanpassport/tree/6784fbbffd515f87be2246cbc521161085a8f6f9) (8-9-2016) 
+### [2.0.2](https://github.com/sanjorgek/sanpassport/tree/6784fbbffd515f87be2246cbc521161085a8f6f9) (8-9-2016)
 
 * Password validation.
 
-### [2.0.1](https://github.com/sanjorgek/sanpassport/tree/a20e2d1b8b0a0ba8af6a3a8e667dd2f771c42f80) (7-9-2016) 
+### [2.0.1](https://github.com/sanjorgek/sanpassport/tree/a20e2d1b8b0a0ba8af6a3a8e667dd2f771c42f80) (7-9-2016)
 
 * Strategy Function added as param.
 * Passport dependencie and removed as param.
@@ -174,14 +174,14 @@ See `test/basic.js` for more details.
 * Model create method beside new instance.
 * Test module
 
-### [1.4.0](https://github.com/sanjorgek/sanpassport/tree/110fdaadad1de9ef10d8bb5847f0fa29ee358d7a) (25-7-2016) 
+### [1.4.0](https://github.com/sanjorgek/sanpassport/tree/110fdaadad1de9ef10d8bb5847f0fa29ee358d7a) (25-7-2016)
 
 * README with examples.
 
-### [1.0.0](https://github.com/sanjorgek/sanpassport/tree/f131338f16829c32063a18761ca0463b07432a4f) (12-06-2016) 
+### [1.0.0](https://github.com/sanjorgek/sanpassport/tree/f131338f16829c32063a18761ca0463b07432a4f) (12-06-2016)
 
 Start
- 
+
 
 
 [npm-image]: https://img.shields.io/npm/v/sanpassport.svg
