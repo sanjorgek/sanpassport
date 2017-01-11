@@ -17,16 +17,7 @@ function optStrategyFunc (accessToken, refreshToken, profile, done) {
   done(null, profile);
 }
 
-function optEnsureAuthenticated (req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.status(401);
-  next(401);
-}
-
-module.exports = function (passport, strategyFunc, ensureAuthenticated, config) {
-  if(!ensureAuthenticated ||(typeof ensureAuthenticated != 'function')){
-    ensureAuthenticated = optEnsureAuthenticated;
-  }
+module.exports = function (passport, strategyFunc, config) {
   let strategy = strategyWrapper(optStrategyFunc);
   if (strategyFunc &&  (typeof strategyFunc === 'function')) {
     strategy = strategyWrapper(strategyFunc);
@@ -63,7 +54,6 @@ module.exports = function (passport, strategyFunc, ensureAuthenticated, config) 
   }
 
   return {
-    authenticate: ensureAuthenticated,
     login: login,
     callback: passport.authenticate('google', { failureRedirect: config.failureRedirect })
   };

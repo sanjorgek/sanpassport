@@ -4,8 +4,8 @@ var LocalStrategy = require('passport-local').Strategy,
 
 const MIN_PASSWORD_SCORE = 2;
 
-module.exports = function (passport, userModel, strategyFunc, ensureAuthenticated) {
-  
+module.exports = function (passport, userModel, strategyFunc) {
+
   function optStrategyFunc(username, password, done) {
     userModel.findOne({ username: username }, function(err, user) {
       if (err) {
@@ -33,17 +33,9 @@ module.exports = function (passport, userModel, strategyFunc, ensureAuthenticate
   if(strategyFunc &&  (typeof strategyFunc === 'function')){
     passport.use(new LocalStrategy(strategyFunc));
   }else if(strategyFunc &&  (typeof strategyFunc === 'object')){
-    passport.use(new LocalStrategy(strategyFunc.options, strategyFunc.func));    
+    passport.use(new LocalStrategy(strategyFunc.options, strategyFunc.func));
   }else{
     passport.use(new LocalStrategy(optStrategyFunc));
-  }
-
-  if(!ensureAuthenticated ||(typeof ensureAuthenticated != 'function')){
-    ensureAuthenticated = function(req, res, next) {
-      if (req.isAuthenticated()) { return next(); }
-      res.status(401);
-      next(401);
-    };
   }
 
   function ensureAdmin(req, res, next) {
@@ -69,7 +61,7 @@ module.exports = function (passport, userModel, strategyFunc, ensureAuthenticate
       done(new Error("Missing password"));
     }
   }
-  
+
   function login(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
       if (err) { return next(err); }
@@ -86,10 +78,9 @@ module.exports = function (passport, userModel, strategyFunc, ensureAuthenticate
   }
 
   return {
-    authenticate: ensureAuthenticated,
 
     createUser : createUser,
-    
+
     login: login
   };
 };

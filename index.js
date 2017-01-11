@@ -5,7 +5,13 @@ var passport = require('passport'),
   local = require('./strategies/local');
   google = require('./strategies/google.js');
 
-module.exports = function(strategiesOps) {
+function auth (req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.status(401);
+  next(401);
+}
+
+module.exports = function(strategiesOps, ensureAuthenticated = auth) {
   passport.serializeUser(function(user, done) {
     if (user.strategy === 'google'){
       return done(null, user);
@@ -37,12 +43,14 @@ module.exports = function(strategiesOps) {
 
     session: passport.session(),
 
-    logout: logout
+    logout: logout,
+
+    authenticate: ensureAuthenticated
   };
 
   function selectStrategies (opts) {
-    if(opts.name==='local') sanpassport.local = local(passport, opts.model, opts.strategyFunc, opts.authenticate);
-    if(opts.name==='google')sanpassport.google = google(passport, opts.strategyFunc, opts.authenticate, opts.config);
+    if(opts.name==='local') sanpassport.local = local(passport, opts.model, opts.strategyFunc);
+    if(opts.name==='google')sanpassport.google = google(passport, opts.strategyFunc,opts.config);
   }
 
   map(

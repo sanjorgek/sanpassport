@@ -1,4 +1,4 @@
-# sanpassport
+  # sanpassport
 
   [![NPM Version][npm-image]][npm-url]
   [![NPM Downloads][downloads-month]][downloads-url]
@@ -69,7 +69,6 @@ var sanpassport = require('sanpassport')([
       }
     },
     model: UserModel,
-    authenticate: ensureAuthenticated
   },
   // or
   {
@@ -86,14 +85,13 @@ var sanpassport = require('sanpassport')([
   {
     name: 'google-oauth',
     strategyFunc: googleFunc,
-    authenticate: ensureAuthenticated
     config: {
       clientID: "your_client_id",
       clientSecret: "SHHHH! It's a secret",
       failureRedirect : "/"
     }
   }
-]);
+], ensureAuthenticated);
 ```
 
 ## Use
@@ -110,6 +108,11 @@ app.post("/login", sanpassport.local.login, function(req, res, next){
 app.post("/loginGoogle", sanpassport.google.login, function(req, res, next){
   //...
 });
+
+app.get("callback/URL", sanpassport.google.callback, function(req,res, next){
+  //...
+});
+
 app.post("/logout", sanpassport.logout, function(req, res, next){
   //...
 });
@@ -124,11 +127,7 @@ app.post("/signin", function(req, res){
   });
 });
 
-app.post("/secure/route", sanpassport.local.authenticate, function(req, res){
-  //...
-});
-
-app.get('/verifyLogin', sanpassport.google.authenticate, function(req, res) {
+app.post("/secure/route", sanpassport.authenticate, function(req, res){
   //...
 });
 ```
@@ -139,7 +138,7 @@ See `test/basic.js` for more details.
 
 - [ ] Strategies
   - [x] Local
-  - [ ] Google OAuth
+  - [x] Google OAuth2.0
   - [ ] Facebook
   - [ ] Twitter
   - [ ] OAuth
