@@ -7,14 +7,22 @@ var passport = require('passport'),
 
 module.exports = function(strategiesOps) {
   passport.serializeUser(function(user, done) {
+    if (user.strategy === 'google'){
+      return done(null, user);
+    }
     if(!user) done(new Error("bad user"));
     else done(null, user);
+
   });
 
   passport.deserializeUser(function(obj, done) {
+    if (obj.strategy === 'google'){
+      return done(null, obj);
+    }
     userModel.find(obj, function (err, user) {
       done(err, user);
     });
+
   });
 
   function logout (req, res, next) {

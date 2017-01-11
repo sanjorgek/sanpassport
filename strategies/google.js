@@ -1,8 +1,20 @@
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
   debug = require('debug')('sanpassport:google');
 
+function strategyWrapper(strategyFunction){
+  return function(accessToken, refreshToken, profile, done){
+    strategyFunction(accessToken, refreshToken, profile, function(err, profile){
+      if (err){
+        return done(err);
+      }
+      profile.strategy = 'google';
+      done(err, profile);
+    });
+  }
+}
+
 function optStrategyFunc (accessToken, refreshToken, profile, done) {
-    done(null, profile);
+  done(null, profile);
 }
 
 function optEnsureAuthenticated (req, res, next) {
@@ -15,9 +27,9 @@ module.exports = function (passport, strategyFunc, ensureAuthenticated, config) 
   if(!ensureAuthenticated ||(typeof ensureAuthenticated != 'function')){
     ensureAuthenticated = optEnsureAuthenticated;
   }
-  let strategy = optStrategyFunc;
+  let strategy = strategyWrapper(optStrategyFunc);
   if (strategyFunc &&  (typeof strategyFunc === 'function')) {
-    strategy = strategyFunc;
+    strategy = strategyWrapper(strategyFunc);
   }
   if (!config.failureRedirect) {
     config.failureRedirect = '/';
