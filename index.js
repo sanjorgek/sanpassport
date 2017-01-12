@@ -16,8 +16,7 @@ module.exports = function(strategiesOps, ensureAuthenticated = auth) {
     if (user.strategy === 'google'){
       return done(null, user);
     }
-    if(!user) done(new Error("bad user"));
-    else done(null, user);
+    done(null, user);
 
   });
 
@@ -25,9 +24,7 @@ module.exports = function(strategiesOps, ensureAuthenticated = auth) {
     if (obj.strategy === 'google'){
       return done(null, obj);
     }
-    userModel.find(obj, function (err, user) {
-      done(err, user);
-    });
+    done(null, obj);
 
   });
 
