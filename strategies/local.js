@@ -1,4 +1,5 @@
 var LocalStrategy = require('passport-local').Strategy,
+  cbLogin = require('../lib/common').login,
   debug = require('debug')('sanpassport:local'),
   zxcvbn = require("zxcvbn");
 
@@ -63,18 +64,7 @@ module.exports = function (passport, userModel, strategyFunc) {
   }
 
   function login(req, res, next) {
-    passport.authenticate('local', function(err, user, info) {
-      if (err) { return next(err); }
-      if (!user) {
-        req.session.messages =  [info.message];
-        res.status(403);
-        return next(403);
-      }
-      req.logIn(user, function(err) {
-        if (err) { return next(err); }
-        return next();
-      });
-    })(req, res, next);
+    passport.authenticate('local', cbLogin(req, res, next))(req, res, next);
   }
 
   return {
