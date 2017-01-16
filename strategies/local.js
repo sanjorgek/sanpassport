@@ -49,7 +49,7 @@ module.exports = function (passport, userModel, strategyFunc) {
 
   function createUser(userJson, done) {
     if(userJson.password){
-      var result = zxcvbn(userJson.password);
+      let result = zxcvbn(userJson.password);
       if (result.score < MIN_PASSWORD_SCORE) return done(new Error("Password is too simple"));
       userModel.create(userJson, function(err, user) {
           if(err) {
