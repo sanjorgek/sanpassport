@@ -81,7 +81,7 @@ describe('Basic tests ::', function() {
 		
 		app.get('/', success);
 		
-		app.get('/needAuth', sanpassport.local.authenticate, success);
+		app.get('/needAuth', sanpassport.authenticate, success);
 			
 		app.post('/login', sanpassport.local.login, success);
 
@@ -271,7 +271,7 @@ describe('Optional test::', function() {
 		
 		app.get('/', success);
 		
-		app.get('/needAuth', sanpassport.local.authenticate, success);
+		app.get('/needAuth', sanpassport.authenticate, success);
 			
 		app.post('/login', sanpassport.local.login, success);
 
