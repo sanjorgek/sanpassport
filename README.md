@@ -91,7 +91,11 @@ var sanpassport = require('sanpassport')([
       failureRedirect : "/"
     }
   }
-], ensureAuthenticated);
+],  
+ensureAuthenticated, // optional
+serialiseFunc, // optional
+deserialiseFunc // optional
+);
 ```
 
 ## Use

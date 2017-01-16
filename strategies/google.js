@@ -34,7 +34,7 @@ module.exports = function (passport, strategyFunc, config) {
     new GoogleStrategy({
         clientID: config.clientID,
         clientSecret: config.clientSecret,
-        callbackURL: config.callbackURL,
+        callbackURL: config.callbackURL
       },
       strategy
   ));

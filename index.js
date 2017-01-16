@@ -11,22 +11,14 @@ function auth (req, res, next) {
   next(401);
 }
 
-module.exports = function(strategiesOps, ensureAuthenticated = auth) {
-  passport.serializeUser(function(user, done) {
-    if (user.strategy === 'google'){
-      return done(null, user);
-    }
-    done(null, user);
+function serialDefault (user,done) {
+  done(null, user);
+}
 
-  });
+module.exports = function(strategiesOps, ensureAuthenticated = auth, serailFunc = serialDefault, deserailFunc = serialDefault) {
+  passport.serializeUser(serailFunc);
 
-  passport.deserializeUser(function(obj, done) {
-    if (obj.strategy === 'google'){
-      return done(null, obj);
-    }
-    done(null, obj);
-
-  });
+  passport.deserializeUser(deserailFunc);
 
   function logout (req, res, next) {
     if(req.user){

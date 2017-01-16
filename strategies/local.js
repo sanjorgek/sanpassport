@@ -22,6 +22,7 @@ module.exports = function (passport, userModel, strategyFunc) {
           return done(err);
         }
         if(isMatch) {
+          user.profile = "local";
           return done(null, user);
         } else {
           debug("don't match");
@@ -40,10 +41,10 @@ module.exports = function (passport, userModel, strategyFunc) {
   }
 
   function ensureAdmin(req, res, next) {
-    if(req.user && req.user.admin === true) next();
+    if(req.user && req.user.admin === true) return next();
     else{
         res.status(401);
-        next(401);
+        return next(401);
     }
   }
 
