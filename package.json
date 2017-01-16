@@ -17,7 +17,18 @@
     "login",
     "auth"
   ],
-  "author": "sanjorgek",
+  "author":{
+    "name": "Jorge Santiago Alvarez Cuadros",
+    "email": "sanjorgek@ciencias.unam.mx",
+    "url": "http://sanjorgek.com/"
+  },
+  "contributors":[
+    {
+      "name": "Daniel González Espinoza",
+      "email": "danielglezespinoza@gmail.com",
+      "url": "https://github.com/malpercio/"
+    }
+  ],
   "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/sanjorgek/sanpassport/issues"
