@@ -146,6 +146,11 @@ See `test/basic.js` for more details.
 
 ## Changelog
 
+### [4.0.0]()
+
+* Node v6 or newer only.
+* Google Oauth supported.
+
 ### [3.0.0](https://github.com/sanjorgek/sanpassport/tree/1b25fe6e5359c16c6b998948f85bc57aac1b9930) (27-10-2016)
 
 * Travis integration.
