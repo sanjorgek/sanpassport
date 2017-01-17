@@ -17,7 +17,18 @@
     "login",
     "auth"
   ],
-  "author": "sanjorgek",
+  "author":{
+    "name": "Jorge Santiago Alvarez Cuadros",
+    "email": "sanjorgek@ciencias.unam.mx",
+    "url": "http://sanjorgek.com/"
+  },
+  "contributors":[
+    {
+      "name": "Daniel González Espinoza",
+      "email": "danielglezespinoza@gmail.com",
+      "url": "https://github.com/malpercio/"
+    }
+  ],
   "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/sanjorgek/sanpassport/issues"
@@ -31,12 +42,14 @@
     "supertest": "^2.0.1"
   },
   "dependencies": {
+    "async": "^2.1.4",
     "body-parser": "^1.15.2",
     "cookie-parser": "^1.4.3",
     "debug": "^2.2.0",
     "express-session": "^1.14.2",
     "method-override": "^2.3.7",
     "passport": "^0.3.2",
+    "passport-google-oauth": "^1.0.0",
     "passport-local": "^1.0.0",
     "zxcvbn": "^4.3.0"
   }

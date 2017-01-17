@@ -50,7 +50,7 @@ userModel.findOne({ username: "notadmin" }, function(err, user) {
 describe('Basic tests ::', function() {
 	before(function (done) {
 		
-		sanpassport = require('../')(userModel);
+    sanpassport = require('../')([{name:'local', model: userModel}]);
 
 		var express = require('express');
 		
@@ -81,9 +81,9 @@ describe('Basic tests ::', function() {
 		
 		app.get('/', success);
 		
-		app.get('/needAuth', sanpassport.ensureAuthenticated, success);
+		app.get('/needAuth', sanpassport.authenticate, success);
 			
-		app.post('/login', sanpassport.login, success);
+		app.post('/login', sanpassport.local.login, success);
 
 		app.post('/logout', sanpassport.logout, success);
 		
@@ -228,16 +228,19 @@ describe('Optional test::', function() {
       });
     }
 		
-		sanpassport = require('../')(
-      userModel,
+    sanpassport = require('../')([
       {
-        func: strategyF, 
-        options: {
-        usernameField: 'email',
-        passwordField: 'password'
-        }
+        name:'local',
+        strategyFunc: {
+          func: strategyF, 
+          options: {
+            usernameField: 'email',
+            passwordField: 'password'
+          }
+        },
+        model: userModel
       }
-    );
+    ]);
 
 		var express = require('express');
 		
@@ -268,9 +271,9 @@ describe('Optional test::', function() {
 		
 		app.get('/', success);
 		
-		app.get('/needAuth', sanpassport.ensureAuthenticated, success);
+		app.get('/needAuth', sanpassport.authenticate, success);
 			
-		app.post('/login', sanpassport.login, success);
+		app.post('/login', sanpassport.local.login, success);
 
 		app.post('/logout', sanpassport.logout, success);
 		
