@@ -1,6 +1,6 @@
 {
   "name": "sanpassport",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Passport and passport-local simple adapter",
   "main": "index.js",
   "scripts": {
@@ -17,12 +17,12 @@
     "login",
     "auth"
   ],
-  "author":{
+  "author": {
     "name": "Jorge Santiago Alvarez Cuadros",
     "email": "sanjorgek@ciencias.unam.mx",
     "url": "http://sanjorgek.com/"
   },
-  "contributors":[
+  "contributors": [
     {
       "name": "Daniel González Espinoza",
       "email": "danielglezespinoza@gmail.com",
