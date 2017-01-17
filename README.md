@@ -7,6 +7,8 @@
   [![bitHound Dependencies](https://www.bithound.io/github/sanjorgek/sanpassport/badges/dependencies.svg)](https://www.bithound.io/github/sanjorgek/sanpassport/Integrations/dependencies/npm)
   [![bitHound Dev Dependencies](https://www.bithound.io/github/sanjorgek/sanpassport/badges/devDependencies.svg)](https://www.bithound.io/github/sanjorgek/sanpassport/Integrations/dependencies/npm)
   [![bitHound Code](https://www.bithound.io/github/sanjorgek/sanpassport/badges/code.svg)](https://www.bithound.io/github/sanjorgek/sanpassport)
+  [![Code Climate](https://codeclimate.com/github/sanjorgek/sanpassport/badges/gpa.svg)](https://codeclimate.com/github/sanjorgek/sanpassport)
+  [![Issue Count](https://codeclimate.com/github/sanjorgek/sanpassport/badges/issue_count.svg)](https://codeclimate.com/github/sanjorgek/sanpassport)  
 
 ## About
 [Passport](https://www.npmjs.com/package/passport) [passport-local](https://www.npmjs.com/package/passport-local) and [passport-google-oauth](https://www.npmjs.com/package/passport-google-oauth) wrapper.
