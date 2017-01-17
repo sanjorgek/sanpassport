@@ -1,4 +1,4 @@
-  # sanpassport
+# sanpassport
 
   [![NPM Version][npm-image]][npm-url]
   [![NPM Downloads][downloads-month]][downloads-url]
