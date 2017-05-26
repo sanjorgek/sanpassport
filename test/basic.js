@@ -59,7 +59,7 @@ describe('Basic tests ::', function() {
 		app.use(express.static( "public" ) );
 		//app.use(express.logger());
 		app.use(cookieParser());
-		app.use(bodyParser());
+		app.use(bodyParser.json());
 		app.use(methodOverride());
 		app.use(
 			expressSession(
@@ -68,7 +68,9 @@ describe('Basic tests ::', function() {
 					secret: "test",
 					cookie: {
 						maxAge: 1000*60*60*24*5
-					}
+					},
+					resave: true,
+					saveUninitialized: false
 				}
 			)
 		);
@@ -76,7 +78,7 @@ describe('Basic tests ::', function() {
 		app.use(sanpassport.session);
 
     function success (req, res) {
-      return res.send(200);
+      return res.sendStatus(200);
     }
 		
 		app.get('/', success);
@@ -104,7 +106,7 @@ describe('Basic tests ::', function() {
 				res.status(err.status || err);
 				res.redirect("/");
 			}else if(err){
-				res.send(err);
+				res.sendStatus(err);
 			}else res.send(400);
 		});
 		
@@ -249,7 +251,7 @@ describe('Optional test::', function() {
 		app.use(express.static( "public" ) );
 		//app.use(express.logger());
 		app.use(cookieParser());
-		app.use(bodyParser());
+		app.use(bodyParser.json());
 		app.use(methodOverride());
 		app.use(
 			expressSession(
@@ -258,7 +260,9 @@ describe('Optional test::', function() {
 					secret: "test",
 					cookie: {
 						maxAge: 1000*60*60*24*5
-					}
+					},
+					saveUninitialized: false,
+					resave: true
 				}
 			)
 		);
@@ -266,7 +270,7 @@ describe('Optional test::', function() {
 		app.use(sanpassport.session);
 
     function success (req, res) {
-      return res.send(200);
+      return res.sendStatus(200);
     }
 		
 		app.get('/', success);
@@ -294,7 +298,7 @@ describe('Optional test::', function() {
 				res.status(err.status || err);
 				res.redirect("/");
 			}else if(err){
-				res.send(err);
+				res.sendStatus(err);
 			}else res.send(400);
 		});
 		
@@ -381,6 +385,21 @@ describe('Optional test::', function() {
 		.end(function (err, res) {
 			if(err) done(err);
 			else request(app).post('/logout')
+        .set('Cookie',res.header['set-cookie'])
+        .expect(200)
+        .end(function (err, res) {
+          if(err) done(err);
+          else done();
+        });
+		});
+	});
+	it("good password3", function (done) {
+		request(app).post('/login')
+		.send({email: "notadmin@prueba.com", password: "12345678"})
+		.expect(200)
+		.end(function (err, res) {
+			if(err) done(err);
+			else request(app).get('/needAuth')
         .set('Cookie',res.header['set-cookie'])
         .expect(200)
         .end(function (err, res) {
