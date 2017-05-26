@@ -35,11 +35,11 @@
   },
   "homepage": "https://github.com/sanjorgek/sanpassport#readme",
   "devDependencies": {
-    "express": "~4.14.0",
+    "express": "~4.15.3",
     "mocha": "x",
     "mongodb": "^2.1.18",
     "mongoose": "^4.5.0",
-    "supertest": "^2.0.1"
+    "supertest": "^3.0.0"
   },
   "dependencies": {
     "body-parser": "^1.15.2",

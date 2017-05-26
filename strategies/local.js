@@ -31,7 +31,7 @@ const optStrategyFunc = (userModel) => (username, password, done) => {
               })();
         });
   });
-}
+};
 
 const ensureAdmin = (req, res, next) => {
   return (req.user && req.user.admin === true)? 
@@ -40,15 +40,17 @@ const ensureAdmin = (req, res, next) => {
         res.status(401);
         return next(401);
     })();
-}
+};
 
 module.exports = (passport, userModel, strategyFunc) => {
 
-  (strategyFunc &&  (typeof strategyFunc === 'function'))?
-    passport.use(new LocalStrategy(strategyFunc)):
-    (strategyFunc &&  (typeof strategyFunc === 'object'))?
-      passport.use(new LocalStrategy(strategyFunc.options, strategyFunc.func)):
-      passport.use(new LocalStrategy(optStrategyFunc(userModel)));
+  if (strategyFunc &&  (typeof strategyFunc === 'function')){
+    passport.use(new LocalStrategy(strategyFunc));
+  }else if(strategyFunc &&  (typeof strategyFunc === 'object')){
+    passport.use(new LocalStrategy(strategyFunc.options, strategyFunc.func));
+  }else{
+    passport.use(new LocalStrategy(optStrategyFunc(userModel)));
+  } 
 
   let createUser = (userJson, done) => {
     return (!userJson.password)? 
@@ -64,7 +66,7 @@ module.exports = (passport, userModel, strategyFunc) => {
             }
         });
       })();
-  }
+  };
 
   return {
 

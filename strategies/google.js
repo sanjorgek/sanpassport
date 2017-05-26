@@ -11,11 +11,11 @@ const strategyWrapper = (strategyFunction) => (accessToken, refreshToken, profil
         done(err, profile);
       })();
   });
-}
+};
 
 const optStrategyFunc = (accessToken, refreshToken, profile, done) => {
   return done(null, profile);
-}
+};
 
 module.exports = (passport, strategyFunc, config) => {
   let strategy = strategyWrapper(optStrategyFunc);
