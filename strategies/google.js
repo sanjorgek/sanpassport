@@ -1,24 +1,23 @@
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
   cbLogin = require('../lib/common').login,
   debug = require('debug')('sanpassport:google');
 
-function strategyWrapper(strategyFunction){
-  return function(accessToken, refreshToken, profile, done){
-    strategyFunction(accessToken, refreshToken, profile, function(err, profile){
-      if (err){
-        return done(err);
-      }
-      profile.strategy = 'google';
-      done(err, profile);
-    });
-  };
+const strategyWrapper = (strategyFunction) => (accessToken, refreshToken, profile, done) => {
+  strategyFunction(accessToken, refreshToken, profile, function(err, profile){
+    return (err)? 
+      done(err):
+      (() => {
+        profile.strategy = 'google';
+        done(err, profile);
+      })();
+  });
 }
 
-function optStrategyFunc (accessToken, refreshToken, profile, done) {
-  done(null, profile);
+const optStrategyFunc = (accessToken, refreshToken, profile, done) => {
+  return done(null, profile);
 }
 
-module.exports = function (passport, strategyFunc, config) {
+module.exports = (passport, strategyFunc, config) => {
   let strategy = strategyWrapper(optStrategyFunc);
   if (strategyFunc &&  (typeof strategyFunc === 'function')) {
     strategy = strategyWrapper(strategyFunc);
@@ -39,12 +38,8 @@ module.exports = function (passport, strategyFunc, config) {
       strategy
   ));
 
-  function login(req, res, next) {
-    passport.authenticate('google', {failureRedirect: config.failureRedirect, scope: config.scope}, cbLogin(req, res, next))(req, res, next);
-  }
-
   return {
-    login: login,
+    login: passport.authenticate('google', {failureRedirect: config.failureRedirect, scope: config.scope}, cbLogin(req, res, next)),
     callback: passport.authenticate('google', { failureRedirect: config.failureRedirect })
   };
 };
