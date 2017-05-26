@@ -1,8 +1,7 @@
 const passport = require('passport'),
   debug = require('debug')('sanpassport'),
-  map = require('async/map'),
-  asyncify = require('async/asyncify'),
   local = require('./strategies/local');
+  _ = require('lodash'),
   google = require('./strategies/google.js');
 
 const auth = (req, res, next) => {
@@ -45,10 +44,9 @@ module.exports = (strategiesOps, ensureAuthenticated = auth, serailFunc = serial
     if(opts.name==='google')sanpassport.google = google(passport, opts.strategyFunc,opts.config);
   }
 
-  map(
+  _.map(
     strategiesOps,
-    asyncify(selectStrategies),
-    debug
+    selectStrategies
   );
 
   return sanpassport;

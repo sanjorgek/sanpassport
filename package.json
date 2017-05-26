@@ -42,11 +42,11 @@
     "supertest": "^2.0.1"
   },
   "dependencies": {
-    "async": "^2.1.4",
     "body-parser": "^1.15.2",
     "cookie-parser": "^1.4.3",
     "debug": "^2.2.0",
     "express-session": "^1.14.2",
+    "lodash": "^4.17.4",
     "method-override": "^2.3.7",
     "passport": "^0.3.2",
     "passport-google-oauth": "^1.0.0",
