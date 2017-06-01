@@ -1,53 +1,40 @@
 const passport = require('passport'),
   debug = require('debug')('sanpassport'),
   local = require('./strategies/local'),
-  _ = require('lodash'),
   google = require('./strategies/google.js');
 
-const auth = (req, res, next) => {
-  return (req.isAuthenticated())?
-    next():
-    (() => {
-      res.status(401);
-      next(401);
-    })();
+const serial = (serialise) => {
+  return (serialise && (typeof serialise === "function"))?
+    serialise:
+    (user,done) => {
+      return done(null, user.id||user._id);
+    };
 };
 
-const serialDefault = (user,done) => {
-  done(null, user);
+const deserial = (deserialise) => {
+  return (deserialise && (typeof deserialise === "function"))?
+    deserialise:
+    (user,done) => {
+      return done(null, user);
+    };
 };
 
-const logout = (req, res, next) => {
-  if(req.user){
-    req.logout();
-  }
-  next();
-};
+module.exports = (strategies = {}) => {
+  passport.serializeUser(
+    deserial(strategies.serialise)
+  )
 
-module.exports = (strategiesOps, ensureAuthenticated = auth, serailFunc = serialDefault, deserailFunc = serialDefault) => {
-  passport.serializeUser(serailFunc);
-
-  passport.deserializeUser(deserailFunc);
-
-  let sanpassport = {
-    initialize: passport.initialize(),
-
-    session: passport.session(),
-
-    logout,
-
-    authenticate: ensureAuthenticated
-  };
-
-  let selectStrategies = (opts) => {
-    if(opts.name==='local') sanpassport.local = local(passport, opts.model, opts.strategyFunc);
-    if(opts.name==='google')sanpassport.google = google(passport, opts.strategyFunc,opts.config);
-  };
-
-  _.map(
-    strategiesOps,
-    selectStrategies
+  serial(passport, strategies.serialise);
+  passport.deserializeUser(
+    deserial(strategies.deserialise)
   );
+
+  let sanpassport = {};
+  sanpassport.local = local(passport, strategies.local);
+  sanpassport.google = google(passport, strategies.google);
+
+  sanpassport.initialize= passport.initialize();
+  sanpassport.session= passport.session();
 
   return sanpassport;
 };

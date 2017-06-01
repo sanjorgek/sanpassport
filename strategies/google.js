@@ -17,11 +17,17 @@ const optStrategyFunc = (accessToken, refreshToken, profile, done) => {
   return done(null, profile);
 };
 
-module.exports = (passport, strategyFunc, config) => {
-  let strategy = strategyWrapper(optStrategyFunc);
-  if (strategyFunc &&  (typeof strategyFunc === 'function')) {
-    strategy = strategyWrapper(strategyFunc);
-  }
+module.exports = (passport, strategy={options:
+  {
+    clientID: "your_client_id",
+    clientSecret: "SHHHH! It's a secret",
+    failureRedirect : "/"
+  }}
+) => {
+  let strategyFunc = (strategy.func &&  (typeof strategy.func === 'function'))?
+    strategy.func:
+    optStrategyFunc;
+  let config = strategy.options;
   if (!config.failureRedirect) {
     config.failureRedirect = '/';
   }
@@ -30,16 +36,18 @@ module.exports = (passport, strategyFunc, config) => {
   }
 
   passport.use(
-    new GoogleStrategy({
-        clientID: config.clientID,
-        clientSecret: config.clientSecret,
-        callbackURL: config.callbackURL
-      },
-      strategy
+    new GoogleStrategy(config,
+      strategyWrapper(strategyFunc)
   ));
 
   return {
-    login: passport.authenticate('google', {failureRedirect: config.failureRedirect, scope: config.scope}, cbLogin(req, res, next)),
+    login (req, res, next) {
+      return passport.authenticate(
+        'google',
+        {failureRedirect: config.failureRedirect, scope: config.scope},
+        cbLogin(req, res, next)
+      )(req, res, next);
+    },
     callback: passport.authenticate('google', { failureRedirect: config.failureRedirect })
   };
 };

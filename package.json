@@ -37,8 +37,6 @@
   "devDependencies": {
     "express": "~4.15.3",
     "mocha": "x",
-    "mongodb": "^2.1.18",
-    "mongoose": "^4.5.0",
     "supertest": "^3.0.0"
   },
   "dependencies": {

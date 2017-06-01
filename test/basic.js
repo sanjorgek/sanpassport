@@ -1,56 +1,58 @@
-var sanpassport;
-var app;
-var userModel;
-var request = require('supertest');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var methodOverride = require('method-override');
-var expressSession = require('express-session');
-var mongoose = require('mongoose');
+let sanpassport;
+let app;
+let userModel;
+const request = require('supertest');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const _ = require('lodash');
+const methodOverride = require('method-override');
+const expressSession = require('express-session');
 		
-// Database connect
-var uristring = "mongodb://localhost:27017/sanpassport";
-
-var mongoOptions = { db: { safe: true }};
-
-mongoose.connect(uristring, mongoOptions, function (err, res) {
-  if (err) {
-    console.log ('Error al conectarse con: ' + uristring + '. ' + err);
-  } else {
-    console.log ('Conectado con: ' + uristring);
+const users = [
+  {
+    id: 1,
+    username: 'sanjorgek',
+    password: '12345678'
+  },
+  {
+    id: 2,
+    username: 'test',
+    password: 'test'
   }
-});
+];
 
-var Schema = mongoose.Schema;
+const users2 = [
+  {
+    xid: 1,
+    username: 'sanjorgek',
+		email: 'sanjorgek@prueba.com',
+    password: '12345678'
+  },
+  {
+    xid: 2,
+    username: 'test',
+		email: 'test@test.com',
+    password: 'test'
+  }
+];
 
-// se usa un Schema para crear la estructura de lo necesario para registrar un usuario
-var userSchema = new Schema({
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true},
-  admin: { type: Boolean, required: true }
-});
-
-// Metodo para comparar el pass dado por el usuario y el encriptado que esta en al base de datos
-userSchema.methods.comparePassword = function(candidatePassword, cb) {
-  cb(null, candidatePassword==this.password);
-};
-
-// Exportamos el modelo usado para crear los usuarios
-userModel = mongoose.model('User', userSchema);
-
-userModel.findOne({ username: "sanjorgek" }, function(err, user) {
-  if(!err && !user) userModel.create({username: "sanjorgek", password: "12345678", email: "sanjorgek@prueba.com", admin: true}, function(err, user) {});
-});
-
-userModel.findOne({ username: "notadmin" }, function(err, user) {
-  if(!err && !user) userModel.create({username: "notadmin", password: "12345678", email: "notadmin@prueba.com", admin: false}, function(err, user) {});
-});
-
-describe('Basic tests ::', function() {
+describe('Local tests ::', function() {
 	before(function (done) {
 		
-    sanpassport = require('../')([{name:'local', model: userModel}]);
+    sanpassport = require('../')({
+			local:{
+				func: (username, password, done) => {
+					let user = _.find(users, {username: username, password: password});
+					(!user)?
+						done(null, false, { message: 'Unknown user ' + username }):
+						done(null, user);
+				},
+				options: { //optional
+					usernameField: 'username',
+					passwordField: 'password'
+				}
+			}
+		});
 
 		var express = require('express');
 		
@@ -83,11 +85,11 @@ describe('Basic tests ::', function() {
 		
 		app.get('/', success);
 		
-		app.get('/needAuth', sanpassport.authenticate, success);
+		app.get('/needAuth', sanpassport.local.authenticate, success);
 			
 		app.post('/login', sanpassport.local.login, success);
 
-		app.post('/logout', sanpassport.logout, success);
+		app.post('/logout', sanpassport.local.logout, success);
 		
 		// catch 404 and forward to error handler
 		app.use(function(req, res, next) {
@@ -203,46 +205,26 @@ describe('Basic tests ::', function() {
 	});
 });
 
-describe('Optional test::', function() {
+describe('Optional Local test::', function() {
 	before(function (done) {
-
-    function strategyF(username, password, done) {
-      userModel.findOne({ email: username }, function(err, user) {
-        if (err) {
-          debug(err);
-          return done(err);
-        }
-        if (!user) {
-          return done(null, false, { message: 'Unknown user ' + username });
-        }
-        user.comparePassword(password, function(err, isMatch) {
-          if (err){
-            debug(err);
-            return done(err);
-          }
-          if(isMatch) {
-            return done(null, user);
-          } else {
-            debug("don't match");
-            return done(null, false, { message: 'Invalid password' });
-          }
-        });
-      });
-    }
 		
-    sanpassport = require('../')([
-      {
-        name:'local',
-        strategyFunc: {
-          func: strategyF, 
-          options: {
-            usernameField: 'email',
-            passwordField: 'password'
-          }
-        },
-        model: userModel
-      }
-    ]);
+    sanpassport = require('../')({
+			local:{
+				func: (username, password, done) => {
+					let user = _.find(users2, {email: username, password: password});
+					(!user)?
+						done(null, false, { message: 'Unknown user ' + username }):
+						done(null, user);
+				},
+				options: { //optional
+					usernameField: 'email',
+					passwordField: 'password'
+				}
+			},
+			serialise: (user,done) => {
+				return done(null, user.id||user.xid);
+			}
+		});
 
 		var express = require('express');
 		
@@ -275,11 +257,11 @@ describe('Optional test::', function() {
 		
 		app.get('/', success);
 		
-		app.get('/needAuth', sanpassport.authenticate, success);
+		app.get('/needAuth', sanpassport.local.authenticate, success);
 			
 		app.post('/login', sanpassport.local.login, success);
 
-		app.post('/logout', sanpassport.logout, success);
+		app.post('/logout', sanpassport.local.logout, success);
 		
 		// catch 404 and forward to error handler
 		app.use(function(req, res, next) {
@@ -368,8 +350,38 @@ describe('Optional test::', function() {
 			else done();
 		});
 	});
-	
-	it("good password", function (done) {
+
+	it("good password bad field", function (done) {
+		request(app).post('/login')
+		.send({username: "sanjorgek@prueba.com", password: "12345678"})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+
+	it("good password bad mail", function (done) {
+		request(app).post('/login')
+		.send({email: "jorge@prueba.com", password: "12345678"})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+
+	it("good mail bad password", function (done) {
+		request(app).post('/login')
+		.send({email: "sanjorgek@prueba.com", password: "1234567348"})
+		.expect(403)
+		.end(function (err, res) {
+			if(err) done(err);
+			else done();
+		});
+	});
+
+	it("OK", function (done) {
 		request(app).post('/login')
 		.send({email: "sanjorgek@prueba.com", password: "12345678"})
 		.expect(200)
@@ -378,9 +390,9 @@ describe('Optional test::', function() {
 			else done();
 		});
 	});
-  it("good password2", function (done) {
+  it("OK2", function (done) {
 		request(app).post('/login')
-		.send({email: "notadmin@prueba.com", password: "12345678"})
+		.send({email: "test@test.com", password: "test"})
 		.expect(200)
 		.end(function (err, res) {
 			if(err) done(err);
@@ -393,9 +405,9 @@ describe('Optional test::', function() {
         });
 		});
 	});
-	it("good password3", function (done) {
+	it("OK3", function (done) {
 		request(app).post('/login')
-		.send({email: "notadmin@prueba.com", password: "12345678"})
+		.send({email: "test@test.com", password: "test"})
 		.expect(200)
 		.end(function (err, res) {
 			if(err) done(err);
