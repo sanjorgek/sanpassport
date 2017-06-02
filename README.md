@@ -98,7 +98,10 @@ app.post("/secure/route", sanpassport.local.authenticate, function(req, res){
 app.post("/token", function(req, res){
 
 });
-app.post("/secure/jwt", sanpassport.jwt.authenticate('jwt', { session: false }), function(req, res){
+app.post(
+  "/secure/jwt",
+  sanpassport.jwt.authenticate,
+  function(req, res){
   //...
 });
 ```
@@ -121,6 +124,7 @@ See `test/basic.js` for more details.
 ### [5.0.0]()
 
 * New formmat
+* [JWT strategy](https://www.npmjs.com/package/passport-jwt)
 
 ### [4.0.1](https://github.com/sanjorgek/sanpassport/tree/79db6a0ab6247f85c1965c1587c2cdceb0801664) (26-05-2017)
 
