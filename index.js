@@ -1,7 +1,11 @@
 const passport = require('passport'),
   debug = require('debug')('sanpassport'),
   local = require('./strategies/local'),
-  google = require('./strategies/google.js');
+  jwt = require('./strategies/jwt'),
+  google = require('./strategies/google.js'),
+  passportJWT = require("passport-jwt"),
+  ExtractJwt = passportJWT.ExtractJwt,
+  zxcvbn = require("zxcvbn");
 
 const serial = (serialise) => {
   return (serialise && (typeof serialise === "function"))?
@@ -19,7 +23,7 @@ const deserial = (deserialise) => {
     };
 };
 
-module.exports = (strategies = {}) => {
+const initialize = (strategies = {}) => {
   passport.serializeUser(
     deserial(strategies.serialise)
   )
@@ -30,11 +34,22 @@ module.exports = (strategies = {}) => {
   );
 
   let sanpassport = {};
-  sanpassport.local = local(passport, strategies.local);
-  sanpassport.google = google(passport, strategies.google);
+
+  if(strategies.local && (typeof strategies.local === "object"))
+    sanpassport.local = local(passport, strategies.local);
+  if(strategies.google && (typeof strategies.google === "object"))
+    sanpassport.google = google(passport, strategies.google);
+  if(strategies.jwt && (typeof strategies.jwt === "object"))
+    sanpassport.jwt = jwt(passport, strategies.jwt);
 
   sanpassport.initialize= passport.initialize();
   sanpassport.session= passport.session();
 
   return sanpassport;
+};
+
+module.exports = {
+  initialize,
+  ExtractJwt,
+  zxcvbn
 };
