@@ -1,79 +1,34 @@
 const LocalStrategy = require('passport-local').Strategy,
   cbLogin = require('../lib/common').login,
-  debug = require('debug')('sanpassport:local'),
-  zxcvbn = require("zxcvbn");
+  debug = require('debug')('sanpassport:local');
 
 const MIN_PASSWORD_SCORE = 2;
 
-const optStrategyFunc = (userModel) => (username, password, done) => {
-  return userModel.findOne({ username: username }, (err, user) => {
-    return (err)? 
-      (() => {
-        debug(err);
-        return done(err);
-      })():
-      (!user)? 
-        done(null, false, { message: 'Unknown user ' + username }):
-        user.comparePassword(password, (err, isMatch) => {
-          return (err)?
-            (() => {
-              debug(err);
-              return done(err);
-            })():          
-            (isMatch)?
-              (() => {
-                user.profile = "local";
-                return done(null, user);
-              })():
-              (() => {
-                debug("don't match");
-                return done(null, false, { message: 'Invalid password' });
-              })();
-        });
-  });
+const localStrategy = (opts, func) => {
+  return (opts &&  (typeof opts === 'object'))?
+    new LocalStrategy(opts, func):
+    new LocalStrategy(func);
 };
 
-const ensureAdmin = (req, res, next) => {
-  return (req.user && req.user.admin === true)? 
-    next():
-    (() => {
-        res.status(401);
-        return next(401);
-    })();
-};
-
-module.exports = (passport, userModel, strategyFunc) => {
-
-  if (strategyFunc &&  (typeof strategyFunc === 'function')){
-    passport.use(new LocalStrategy(strategyFunc));
-  }else if(strategyFunc &&  (typeof strategyFunc === 'object')){
-    passport.use(new LocalStrategy(strategyFunc.options, strategyFunc.func));
-  }else{
-    passport.use(new LocalStrategy(optStrategyFunc(userModel)));
-  } 
-
-  let createUser = (userJson, done) => {
-    return (!userJson.password)? 
-      done(new Error("Missing password")):
-      (() => {
-        let result = zxcvbn(userJson.password);
-        if (result.score < MIN_PASSWORD_SCORE) return done(new Error("Password is too simple"));
-        userModel.create(userJson, function(err, user) {
-            if(err) {
-                done(err);
-            } else {
-                done(null, user);
-            }
-        });
-      })();
-  };
+module.exports = (passport, strategy = {}) => {
+  passport.use(
+    localStrategy(strategy.options, strategy.func)
+  );
 
   return {
-
     login (req, res, next) {
       passport.authenticate('local', cbLogin(req, res, next))(req, res, next);
     },
-
-    createUser
+    logout (req, res, next) {
+      if(req.user){
+        req.logout();
+      }
+      return next();
+    },
+    authenticate (req, res, next) {
+      return (req.isAuthenticated())?
+        next():
+        next(401);
+    }
   };
 };

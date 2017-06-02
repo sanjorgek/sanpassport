@@ -1,53 +1,58 @@
 const passport = require('passport'),
   debug = require('debug')('sanpassport'),
   local = require('./strategies/local'),
-  _ = require('lodash'),
-  google = require('./strategies/google.js');
+  jwt = require('./strategies/jwt'),
+  google = require('./strategies/google.js'),
+  passportJWT = require("passport-jwt"),
+  ExtractJwt = passportJWT.ExtractJwt,
+  zxcvbn = require("zxcvbn");
 
-const auth = (req, res, next) => {
-  return (req.isAuthenticated())?
-    next():
-    (() => {
-      res.status(401);
-      next(401);
-    })();
+const serial = (serialise) => {
+  return (serialise && (typeof serialise === "function"))?
+    serialise:
+    (user,done) => {
+      return done(null, user.id||user._id);
+    };
 };
 
-const serialDefault = (user,done) => {
-  done(null, user);
+const deserial = (deserialise) => {
+  return (deserialise && (typeof deserialise === "function"))?
+    deserialise:
+    (user,done) => {
+      return done(null, user);
+    };
 };
 
-const logout = (req, res, next) => {
-  if(req.user){
-    req.logout();
-  }
-  next();
+const asignStrategy = (strategyType, func) => (passport, strategies) => {
+  return (strategies[strategyType] && (typeof strategies[strategyType] === "object"))?
+    func(passport, strategies[strategyType]):
+    {};
 };
 
-module.exports = (strategiesOps, ensureAuthenticated = auth, serailFunc = serialDefault, deserailFunc = serialDefault) => {
-  passport.serializeUser(serailFunc);
-
-  passport.deserializeUser(deserailFunc);
-
-  let sanpassport = {
-    initialize: passport.initialize(),
-
-    session: passport.session(),
-
-    logout,
-
-    authenticate: ensureAuthenticated
-  };
-
-  let selectStrategies = (opts) => {
-    if(opts.name==='local') sanpassport.local = local(passport, opts.model, opts.strategyFunc);
-    if(opts.name==='google')sanpassport.google = google(passport, opts.strategyFunc,opts.config);
-  };
-
-  _.map(
-    strategiesOps,
-    selectStrategies
+const initialize = (strategies = {}) => {
+  passport.serializeUser(
+    deserial(strategies.serialise)
   );
 
+  serial(passport, strategies.serialise);
+  passport.deserializeUser(
+    deserial(strategies.deserialise)
+  );
+
+  let sanpassport = {
+    local: asignStrategy("local", local)(passport, strategies),
+    google: asignStrategy("google", google)(passport, strategies),
+    jwt: asignStrategy("jwt", jwt)(passport, strategies)
+  };
+
+  sanpassport.initialize= passport.initialize();
+  sanpassport.session= passport.session();
+
   return sanpassport;
+};
+
+module.exports = {
+  initialize,
+  ExtractJwt,
+  zxcvbn
 };

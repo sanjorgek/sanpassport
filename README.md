@@ -21,82 +21,50 @@ Install sanpassport
 ```bash
 $ npm install sanpassport
 ```
-Then you need a valid user model/schema with his constructor, findById and findOne async-functions, also every object need comparePassword and create async-functions.
 
-An example with mongoose:
-
+An example:
 ```js
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var userSchema = new Schema({
-  username: { type: String, required: true, unique: true },
-  name: {type: String, required: true},
-  apaterno: {type: String, required: true},
-  amaterno: {type: String, required: true},
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true},
-  admin: { type: Boolean, required: true }
-});
-userSchema.methods.comparePassword = function(candidatePassword, cb) {
-  // do things
-  var isMatch = this.password == isMatch;
-  cb(null, isMatch);
-};
-
-var UserModel = mongoose.model('User', userSchema);
-
-//optional
-function ensureAuthenticated(req, res, next){
-  //...
-};
-
-//optional, see http://passportjs.org/docs/configure
-// option1
-function strategyFunc(username, password, done){
-  //...
-};
-
-function googleFunc(accessToken, refreshToken, profile, done){
-  //...
-};
-var sanpassport = require('sanpassport')([
-  // Local
+//see http://passportjs.org/docs/configure
+let sanpassport = require('sanpassport')(
   {
-    name: 'local',
-    strategyFunc: {
-      func: strategyFunc,
-      options: {
+    serialise: (user,done) => { // optionsl
+      // ...
+    },
+    deserialise: (user,done) => { //optional
+      // ...
+    },
+    local:{
+      func: (username, password, done) => {
+        //...
+      },
+      options: { //optional
         usernameField: 'email',
         passwordField: 'password'
+      },
+      authenticate: (req, res, next) => {
+        // ...
+        next();
       }
     },
-    model: UserModel,
-  },
-  // or
-  {
-    name: 'local',
-    strategyFunc: strategyFunc,
-    model: UserModel
-  },
-  // or
-  {
-    name: 'local',
-    model: UserModel
-  },
-  // Google
-  {
-    name: 'google-oauth',
-    strategyFunc: googleFunc,
-    config: {
-      clientID: "your_client_id",
-      clientSecret: "SHHHH! It's a secret",
-      failureRedirect : "/"
+    google: {
+      func: (accessToken, refreshToken, profile, done) => {
+        //...
+      },
+      options: {
+        clientID: "your_client_id",
+        clientSecret: "SHHHH! It's a secret",
+        failureRedirect : "/"
+      }
+    },
+    jwt: {
+      func: (jwt_payload, done) => {
+
+      },
+      options: {  
+        // see https://www.npmjs.com/package/passport-jwt#usage
+      }
     }
   }
-],  
-ensureAuthenticated, // optional
-serialiseFunc, // optional
-deserialiseFunc // optional
 );
 ```
 
@@ -105,12 +73,8 @@ An example with [express.js](http://expressjs.com/):
 
 ```js
 app.use(sanpassport.initialize);
-app.use(sanpassport.session);
-//
-app.post("/login", sanpassport.local.login, function(req, res, next){
-  //...
-});
-//
+app.use(sanpassport.session);//optional
+// google
 app.post("/loginGoogle", sanpassport.google.login, function(req, res, next){
   //...
 });
@@ -119,21 +83,25 @@ app.get("callback/URL", sanpassport.google.callback, function(req,res, next){
   //...
 });
 
-app.post("/logout", sanpassport.logout, function(req, res, next){
+// local
+app.post("/login", sanpassport.local.login, function(req, res, next){
   //...
 });
-app.post("/signin", function(req, res){
-  var jsonBody = req.body;
-  sanpassport.local.createUser(jsonBody, function(err, user){
-    if(err || !user){
-      res.send(404);
-    }else{
-      res.send(200);
-    }
-  });
+app.post("/logout", sanpassport.local.logout, function(req, res, next){
+  //...
+});
+app.post("/secure/route", sanpassport.local.authenticate, function(req, res){
+  //...
 });
 
-app.post("/secure/route", sanpassport.authenticate, function(req, res){
+// jwt
+app.post("/token", function(req, res){
+
+});
+app.post(
+  "/secure/jwt",
+  sanpassport.jwt.authenticate,
+  function(req, res){
   //...
 });
 ```
@@ -145,6 +113,7 @@ See `test/basic.js` for more details.
 - [ ] Strategies
   - [x] Local
   - [x] Google OAuth2.0
+  - [x] JSON Web Token
   - [ ] Facebook
   - [ ] Twitter
   - [ ] OAuth
@@ -152,7 +121,14 @@ See `test/basic.js` for more details.
 
 ## Changelog
 
-### [4.0.0]()
+### [5.0.0]()
+
+* New formmat
+* [JWT strategy](https://www.npmjs.com/package/passport-jwt)
+
+### [4.0.1](https://github.com/sanjorgek/sanpassport/tree/79db6a0ab6247f85c1965c1587c2cdceb0801664) (26-05-2017)
+
+### [4.0.0](https://github.com/sanjorgek/sanpassport/tree/78ebb9e7b4219e4dc534254098d22eaa87f6fe6b) (17-01-2017)
 
 * Node v6 or newer only.
 * Google Oauth supported.
