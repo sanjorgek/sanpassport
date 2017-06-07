@@ -27,7 +27,7 @@ An example:
 //see http://passportjs.org/docs/configure
 let sanpassport = require('sanpassport')(
   {
-    serialise: (user,done) => { // optionsl
+    serialise: (user,done) => { // optional
       // ...
     },
     deserialise: (user,done) => { //optional
